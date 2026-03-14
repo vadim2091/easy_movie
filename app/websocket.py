@@ -46,37 +46,28 @@ def handle_message(data):
     
     emit('new_message', response, broadcast=True)
     
-    # ===== ИСПРАВЛЕННЫЙ TELEGRAM =====
-    if not current_user.is_admin:
-        try:
-            # СОХРАНЯЕМ ДАННЫЕ ЗДЕСЬ (а не в потоке)
-            user_id = current_user.id
-            username = current_user.username
-            msg_text = message
-            
-            def send_telegram(uid, uname, text):
-                url = "https://api.telegram.org/bot8648309291:AAGLeQT72rvRFVsdw_dZdeSjwmgFKYb_Sa8/sendMessage"
-                data = {
-                    "chat_id": "5753686567",
-                    "text": f"📨 <b>Новое сообщение от {uname}</b>\n🆔 ID: {uid}\n\n💬 {text}",
-                    "parse_mode": "HTML"
-                }
-                try:
-                    r = requests.post(url, data=data)
-                    if r.status_code == 200:
-                        print(f"✅ Telegram: {text[:30]}...")
-                    else:
-                        print(f"❌ Telegram ошибка: {r.text}")
-                except Exception as e:
-                    print(f"❌ Telegram исключение: {e}")
-            
-            # Передаем данные в поток
-            thread = threading.Thread(target=send_telegram, args=(user_id, username, msg_text), daemon=True)
-            thread.start()
-            print(f"📱 Отправка в Telegram: {message[:30]}...")
-            
-        except Exception as e:
-            print(f"❌ Ошибка отправки в Telegram: {e}")
+# Отправляем в Telegram
+if not current_user.is_admin:
+    try:
+        from app.telegram_bot import send_to_admin
+        
+        # СОЗДАЕМ ВРЕМЕННОГО ПОЛЬЗОВАТЕЛЯ
+        class TempUser:
+            def __init__(self, uid, uname):
+                self.id = uid
+                self.username = uname
+        
+        temp_user = TempUser(current_user.id, current_user.username)
+        
+        # Запускаем асинхронно
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        loop.run_until_complete(send_to_admin(temp_user, message))
+        loop.close()
+        print(f"📱 Отправлено в Telegram: {message}")
+    except Exception as e:
+        print(f"❌ Ошибка: {e}")
+        
 @socketio.on('typing')
 def handle_typing(data):
     if not current_user.is_authenticated:
@@ -123,3 +114,5 @@ def load_chat_history():
         })
     
     emit('chat_history', history, room=f"user_{current_user.id}")
+
+    
