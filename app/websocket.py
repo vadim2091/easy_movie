@@ -3,6 +3,7 @@ from flask_login import current_user
 from datetime import datetime
 import threading
 import requests
+from app.telegram_bot_simple import send_telegram_notification3
 
 socketio = SocketIO(cors_allowed_origins="*")
 
@@ -46,29 +47,20 @@ def handle_message(data):
     
     emit('new_message', response, broadcast=True)
     
-# Отправляем в Telegram
-"""
+# В функции handle_message, после отправки в чат, добавь:
 if not current_user.is_admin:
     try:
-        from app.telegram_bot import send_to_admin
-        
-        # СОЗДАЕМ ВРЕМЕННОГО ПОЛЬЗОВАТЕЛЯ
-        class TempUser:
-            def __init__(self, uid, uname):
-                self.id = uid
-                self.username = uname
-        
-        temp_user = TempUser(current_user.id, current_user.username)
-        
-        # Запускаем асинхронно
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        loop.run_until_complete(send_to_admin(temp_user, message))
-        loop.close()
-        print(f"📱 Отправлено в Telegram: {message}")
+        # Отправляем в Telegram через простой requests
+        send_telegram_notification(
+            current_user.username,
+            current_user.id,
+            message
+        )
+        print(f"📱 Уведомление отправлено: {message[:30]}...")
     except Exception as e:
-        print(f"❌ Ошибка: {e}")
-  """      
+        print(f"❌ Ошибка отправки: {e}")
+
+        
 @socketio.on('typing')
 def handle_typing(data):
     if not current_user.is_authenticated:
