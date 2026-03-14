@@ -11,6 +11,3 @@ flask-wtf==1.2.1
 email-validator==2.1.0
 pillow==10.4.0
 psycopg2-binary==2.9.7
-
-# Telegram - НОВЫЕ ВЕРСИИ!
-aiogram==3.0.0
