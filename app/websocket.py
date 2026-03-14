@@ -3,7 +3,7 @@ from flask_login import current_user
 from datetime import datetime
 import threading
 import requests
-from app.telegram_bot_simple import send_telegram_notification3
+from app.telegram_bot_simple import send_telegram_notification
 
 socketio = SocketIO(cors_allowed_origins="*")
 
