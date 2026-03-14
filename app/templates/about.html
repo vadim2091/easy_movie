@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Заголовок -->
+<div class="mb-8">
+    <h1 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-3">О компании Easy Movie</h1>
+    <p class="text-lg text-gray-600 dark:text-gray-400">Мы создаем возможности для дополнительного заработка с 2023 года</p>
+</div>
+
+<!-- Миссия -->
+<div class="card p-8 mb-8 bg-gradient-to-br from-yellow-50 to-white dark:from-gray-800 dark:to-gray-900">
+    <div class="max-w-3xl">
+        <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Наша миссия</h2>
+        <p class="text-gray-700 dark:text-gray-300 text-lg leading-relaxed">
+            Делать дополнительный заработок доступным, простым и понятным для каждого. 
+            Мы верим, что технологии должны работать на людей, помогая им достигать финансовых целей.
+        </p>
+    </div>
+</div>
+
+<!-- Цифры -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+    <div class="card p-6 text-center">
+        <div class="text-2xl font-bold text-yellow-600 mb-1">2023</div>
+        <div class="text-sm text-gray-600 dark:text-gray-400">год основания</div>
+    </div>
+    <div class="card p-6 text-center">
+        <div class="text-2xl font-bold text-yellow-600 mb-1">50K+</div>
+        <div class="text-sm text-gray-600 dark:text-gray-400">пользователей</div>
+    </div>
+    <div class="card p-6 text-center">
+        <div class="text-2xl font-bold text-yellow-600 mb-1">150+</div>
+        <div class="text-sm text-gray-600 dark:text-gray-400">партнеров</div>
+    </div>
+    <div class="card p-6 text-center">
+        <div class="text-2xl font-bold text-yellow-600 mb-1">24/7</div>
+        <div class="text-sm text-gray-600 dark:text-gray-400">поддержка</div>
+    </div>
+</div>
+
+<!-- Команда -->
+<h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-6">Команда Easy Movie</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <!-- Данила Коньков -->
+    <div class="card p-6 text-center hover:shadow-lg transition">
+        <div class="w-24 h-24 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 mx-auto mb-4 flex items-center justify-center text-white text-3xl font-bold">
+            ДК
+        </div>
+        <h3 class="font-semibold text-lg text-gray-900 dark:text-white mb-1">Данила Коньков</h3>
+        <p class="text-sm text-yellow-600 font-medium mb-3">Основатель, CEO</p>
+        <p class="text-sm text-gray-600 dark:text-gray-400">Более 10 лет в финтехе. Управлял продуктами в Т-Банке и Альфа-Банке.</p>
+    </div>
+
+    <!-- Владислав Блинов -->
+    <div class="card p-6 text-center hover:shadow-lg transition">
+        <div class="w-24 h-24 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 mx-auto mb-4 flex items-center justify-center text-white text-3xl font-bold">
+            ВБ
+        </div>
+        <h3 class="font-semibold text-lg text-gray-900 dark:text-white mb-1">Владислав Блинов</h3>
+        <p class="text-sm text-yellow-600 font-medium mb-3">Технический директор</p>
+        <p class="text-sm text-gray-600 dark:text-gray-400">Экс-тимлид в Яндексе. Специалист по высоконагруженным системам.</p>
+    </div>
+
+    <!-- Екатерина Смирнова -->
+    <div class="card p-6 text-center hover:shadow-lg transition">
+        <div class="w-24 h-24 rounded-full bg-gradient-to-br from-green-400 to-green-600 mx-auto mb-4 flex items-center justify-center text-white text-3xl font-bold">
+            ЕС
+        </div>
+        <h3 class="font-semibold text-lg text-gray-900 dark:text-white mb-1">Екатерина Смирнова</h3>
+        <p class="text-sm text-yellow-600 font-medium mb-3">Руководитель отдела поддержки</p>
+        <p class="text-sm text-gray-600 dark:text-gray-400">Более 7 лет в клиентском сервисе. Создала поддержку с нуля.</p>
+    </div>
+
+    <!-- Алексей Воронов -->
+    <div class="card p-6 text-center hover:shadow-lg transition">
+        <div class="w-24 h-24 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 mx-auto mb-4 flex items-center justify-center text-white text-3xl font-bold">
+            АВ
+        </div>
+        <h3 class="font-semibold text-lg text-gray-900 dark:text-white mb-1">Алексей Воронов</h3>
+        <p class="text-sm text-yellow-600 font-medium mb-3">Руководитель отдела развития</p>
+        <p class="text-sm text-gray-600 dark:text-gray-400">Развивает партнерскую сеть и привлекает лучшие офферы.</p>
+    </div>
+</div>
+
+<!-- Наши ценности -->
+<h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-6">Наши ценности</h2>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="card p-6">
+        <div class="text-3xl mb-3">🎯</div>
+        <h3 class="font-semibold text-lg text-gray-900 dark:text-white mb-2">Прозрачность</h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400">Мы честно рассказываем об условиях заданий и всегда выполняем обязательства</p>
+    </div>
+    <div class="card p-6">
+        <div class="text-3xl mb-3">⚡</div>
+        <h3 class="font-semibold text-lg text-gray-900 dark:text-white mb-2">Эффективность</h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400">Оптимизируем процессы, чтобы вы получали деньги быстрее</p>
+    </div>
+    <div class="card p-6">
+        <div class="text-3xl mb-3">🤝</div>
+        <h3 class="font-semibold text-lg text-gray-900 dark:text-white mb-2">Поддержка</h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400">Помогаем с любыми вопросами 24/7, даже в выходные</p>
+    </div>
+</div>
+
+<!-- Партнеры -->
+<div class="card p-6">
+    <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Нам доверяют</h2>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 text-center">
+            <span class="font-semibold text-gray-700 dark:text-gray-300">Т-Банк</span>
+        </div>
+        <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 text-center">
+            <span class="font-semibold text-gray-700 dark:text-gray-300">Альфа-Банк</span>
+        </div>
+        <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 text-center">
+            <span class="font-semibold text-gray-700 dark:text-gray-300">Сбербанк</span>
+        </div>
+        <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 text-center">
+            <span class="font-semibold text-gray-700 dark:text-gray-300">ВТБ</span>
+        </div>
+    </div>
+</div>
+
+<!-- Контакты -->
+<div class="mt-8 text-center">
+    <p class="text-gray-600 dark:text-gray-400 mb-2">Есть вопросы? Напишите нам</p>
+    <a href="/support" class="btn-primary inline-block">Связаться с поддержкой</a>
+</div>
+{% endblock %}

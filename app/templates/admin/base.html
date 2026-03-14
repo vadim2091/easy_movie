@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Easy Movie Admin</title>
+    
+    <!-- Bootstrap 4 -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        body {
+            background-color: #f8fafc;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, #eab308 0%, #f97316 100%);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: white !important;
+            font-size: 1.5rem;
+        }
+        
+        .sidebar {
+            background: white;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+            min-height: calc(100vh - 70px);
+        }
+        
+        .nav-link {
+            color: #64748b;
+            font-weight: 500;
+            padding: 0.75rem 1.5rem;
+            transition: all 0.2s;
+        }
+        
+        .nav-link:hover {
+            background-color: #fef9c3;
+            color: #eab308;
+        }
+        
+        .nav-link i {
+            margin-right: 0.5rem;
+            width: 1.5rem;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 1rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: all 0.2s;
+        }
+        
+        .card:hover {
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+        
+        .border-left-primary {
+            border-left: 4px solid #eab308 !important;
+        }
+        
+        .border-left-success {
+            border-left: 4px solid #10b981 !important;
+        }
+        
+        .border-left-info {
+            border-left: 4px solid #3b82f6 !important;
+        }
+        
+        .border-left-warning {
+            border-left: 4px solid #f97316 !important;
+        }
+        
+        .text-primary { color: #eab308 !important; }
+        .text-success { color: #10b981 !important; }
+        .text-info { color: #3b82f6 !important; }
+        .text-warning { color: #f97316 !important; }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #eab308 0%, #f97316 100%);
+            border: none;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(234, 179, 8, 0.3);
+        }
+        
+        .table thead th {
+            border-top: none;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+            color: #64748b;
+        }
+        
+        .badge {
+            padding: 0.5rem 0.75rem;
+            font-weight: 500;
+        }
+        
+        .badge-success {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        
+        .badge-warning {
+            background-color: #fed7aa;
+            color: #92400e;
+        }
+        
+        .badge-info {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+    </style>
+</head>
+<body>
+    <!-- Навигация -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('admin.index') }}">
+                <i class="fas fa-crown mr-2"></i>
+                Easy Movie Admin
+            </a>
+            <div class="navbar-text text-white">
+                <i class="fas fa-user mr-2"></i>
+                {{ current_user.username }}
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Сайдбар -->
+            <div class="col-md-2 p-0 sidebar">
+                <div class="nav flex-column">
+                    <a class="nav-link" href="{{ url_for('admin.index') }}">
+                        <i class="fas fa-chart-line"></i>
+                        Дашборд
+                    </a>
+                    <a class="nav-link" href="{{ url_for('user.index_view') }}">
+                        <i class="fas fa-users"></i>
+                        Пользователи
+                    </a>
+                    <a class="nav-link" href="{{ url_for('task.index_view') }}">
+                        <i class="fas fa-tasks"></i>
+                        Задания
+                    </a>
+                    <a class="nav-link" href="{{ url_for('usertask.index_view') }}">
+                        <i class="fas fa-check-circle"></i>
+                        Выполненные
+                    </a>
+    {% if 'transaction' in admin_view.admin._views %}
+    <a class="nav-link" href="{{ url_for('transaction.index_view') }}">
+    <i class="fas fa-coins"></i>
+    Транзакции
+</a>
+{% endif %}
+                    <div class="mt-4 px-4">
+                        <a href="/" class="btn btn-primary btn-block">
+                            <i class="fas fa-arrow-left mr-2"></i>
+                            На сайт
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Контент -->
+            <div class="col-md-10 p-4">
+                {% block body %}{% endblock %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

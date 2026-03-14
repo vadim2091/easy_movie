@@ -1,0 +1,4 @@
+aiogram==2.25.1
+redis==5.0.1
+flask-socketio==5.3.4
+eventlet==0.33.3

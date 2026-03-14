@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="ru" x-data="{ 
+    theme: localStorage.getItem('theme') || 'light',
+    mobileMenuOpen: false 
+}" :class="theme">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Easy Movie - Зарабатывай мандарины</title>
+    
+    <!-- Шрифты -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <style>
+        /* CSS переменные для тем */
+        :root {
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --border: #e2e8f0;
+            --hover: #f1f5f9;
+            --card-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        
+        .dark {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+            --hover: #334155;
+            --card-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+        
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Навигация */
+        .navbar {
+            background-color: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        
+        .nav-link {
+            color: var(--text-secondary);
+            padding: 0.5rem 1rem;
+            border-radius: 0.75rem;
+            transition: all 0.2s;
+        }
+        
+        .nav-link:hover {
+            color: #eab308;
+            background-color: var(--hover);
+        }
+        
+        /* Карточки */
+        .card {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            box-shadow: var(--card-shadow);
+            transition: all 0.2s;
+        }
+        
+        .card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+        }
+        
+        /* Кнопки */
+        .btn-primary {
+            background: linear-gradient(135deg, #eab308, #f97316);
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 0.75rem;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #ca8a04, #ea580c);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(234,179,8,0.3);
+        }
+        
+        .btn-secondary {
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            padding: 0.5rem 1.5rem;
+            border-radius: 0.75rem;
+            transition: all 0.2s;
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--hover);
+        }
+        
+        /* Бейдж баланса */
+        .balance-badge {
+            background: linear-gradient(135deg, #fef9c3, #fef3c7);
+            color: #854d0e;
+            padding: 0.25rem 0.75rem;
+            border-radius: 2rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        
+        .dark .balance-badge {
+            background: linear-gradient(135deg, #854d0e, #a16207);
+            color: #fef9c3;
+        }
+        
+        /* Футер */
+        .footer {
+            background-color: var(--bg-secondary);
+            border-top: 1px solid var(--border);
+            margin-top: auto;
+        }
+        
+        /* Аватар */
+        .avatar {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 9999px;
+            background: linear-gradient(135deg, #eab308, #f97316);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+        
+        /* Мобильное меню */
+        .mobile-menu {
+            display: none;
+            position: absolute;
+            top: 4rem;
+            left: 0;
+            right: 0;
+            background-color: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem;
+            z-index: 40;
+        }
+        
+        .mobile-menu.active {
+            display: block;
+        }
+        
+        @media (min-width: 768px) {
+            .mobile-menu {
+                display: none !important;
+            }
+        }
+        
+        /* Переключатель темы */
+        .theme-switch {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 0.75rem;
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .theme-switch:hover {
+            background-color: var(--hover);
+        }
+        
+        /* Дропдаун */
+        .dropdown {
+            position: relative;
+        }
+        
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            min-width: 200px;
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            margin-top: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+            z-index: 50;
+            display: none;
+        }
+        
+        .dropdown:hover .dropdown-menu {
+            display: block;
+        }
+        
+        .dropdown-item {
+            padding: 0.75rem 1rem;
+            color: var(--text-primary);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .dropdown-item:hover {
+            background-color: var(--hover);
+        }
+        
+        /* Уведомления */
+        .toast {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+            z-index: 100;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Навигация -->
+    <nav class="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Лого -->
+                <div class="flex items-center space-x-8">
+                    <a href="/" class="flex items-center space-x-2">
+                        <span class="text-2xl">💰</span>
+                        <span class="text-xl font-bold bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text text-transparent">
+                            Easy Movie
+                        </span>
+                    </a>
+                    
+                    <!-- Десктоп меню -->
+                    <div class="hidden md:flex items-center space-x-1">
+                        <a href="/" class="nav-link">Главная</a>
+                        <a href="/about" class="nav-link">О нас</a>
+                        <a href="/tasks" class="nav-link">
+                            Задания
+                            <span class="ml-1 bg-yellow-500 text-white text-xs px-1.5 py-0.5 rounded-full">100+</span>
+                        </a>
+                        <a href="/how-it-works" class="nav-link">Как это работает</a>
+                        <a href="/support" class="nav-link">Поддержка</a>
+                    </div>
+                </div>
+
+                <!-- Правая часть -->
+                <div class="flex items-center space-x-3">
+                    <!-- Переключатель темы -->
+                    <button @click="theme = theme === 'light' ? 'dark' : 'light'; localStorage.setItem('theme', theme)" 
+                            class="theme-switch">
+                        <i x-show="theme === 'light'" class="fas fa-moon text-gray-600"></i>
+                        <i x-show="theme === 'dark'" class="fas fa-sun text-yellow-500"></i>
+                    </button>
+
+                    {% if current_user.is_authenticated %}
+                        <!-- Десктоп профиль -->
+                        <div class="hidden md:block dropdown">
+                            <button class="flex items-center space-x-3 nav-link">
+                                <div class="text-right">
+                                    <div class="text-sm font-medium">{{ current_user.username }}</div>
+                                    <div class="balance-badge">{{ current_user.balance }} 🍊</div>
+                                </div>
+                                <div class="avatar">
+                                    {{ current_user.username[0]|upper }}
+                                </div>
+                            </button>
+                            
+                            <div class="dropdown-menu">
+                                <a href="{{ url_for('profile.profile') }}" class="dropdown-item">
+                                    <i class="fas fa-user w-5"></i>
+                                    Профиль
+                                </a>
+                                <a href="{{ url_for('auth.logout') }}" class="dropdown-item">
+                                    <i class="fas fa-sign-out-alt w-5"></i>
+                                    Выйти
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <!-- Мобильный профиль -->
+                        <a href="{{ url_for('profile.profile') }}" class="md:hidden">
+                            <div class="avatar">
+                                {{ current_user.username[0]|upper }}
+                            </div>
+                        </a>
+                    {% else %}
+                        <!-- Кнопки входа -->
+                        <a href="{{ url_for('auth.login') }}" class="hidden md:inline-block btn-secondary">Войти</a>
+                        <a href="{{ url_for('auth.register') }}" class="hidden md:inline-block btn-primary">Регистрация</a>
+                        
+                        <!-- Мобильные иконки -->
+                        <a href="{{ url_for('auth.login') }}" class="md:hidden nav-link">
+                            <i class="fas fa-sign-in-alt"></i>
+                        </a>
+                        <a href="{{ url_for('auth.register') }}" class="md:hidden nav-link">
+                            <i class="fas fa-user-plus"></i>
+                        </a>
+                    {% endif %}
+
+                    <!-- Кнопка мобильного меню -->
+                    <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden nav-link">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Мобильное меню -->
+        <div x-show="mobileMenuOpen" @click.away="mobileMenuOpen = false" class="mobile-menu" :class="{ 'active': mobileMenuOpen }">
+            <div class="flex flex-col space-y-2">
+                <a href="/" class="nav-link block" @click="mobileMenuOpen = false">Главная</a>
+                <a href="/about" class="nav-link block" @click="mobileMenuOpen = false">О нас</a>
+                <a href="/tasks" class="nav-link block" @click="mobileMenuOpen = false">Задания</a>
+                <a href="/how-it-works" class="nav-link block" @click="mobileMenuOpen = false">Как это работает</a>
+                <a href="/support" class="nav-link block" @click="mobileMenuOpen = false">Поддержка</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Основной контент -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Футер -->
+    <footer class="footer">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="font-semibold mb-4">Easy Movie</h3>
+                    <p class="text-sm text-[var(--text-secondary)]">Зарабатывай мандарины выполняя простые задания</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Навигация</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="/about" class="text-[var(--text-secondary)] hover:text-yellow-600">О нас</a></li>
+                        <li><a href="/tasks" class="text-[var(--text-secondary)] hover:text-yellow-600">Задания</a></li>
+                        <li><a href="/how-it-works" class="text-[var(--text-secondary)] hover:text-yellow-600">Как это работает</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Поддержка</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="/support" class="text-[var(--text-secondary)] hover:text-yellow-600">Чат поддержки</a></li>
+                        <li><a href="#" class="text-[var(--text-secondary)] hover:text-yellow-600">FAQ</a></li>
+                        <li><a href="#" class="text-[var(--text-secondary)] hover:text-yellow-600">Правила</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Социальные сети</h4>
+                    <div class="flex space-x-4">
+                        <a href="#" class="w-10 h-10 rounded-xl bg-[var(--bg-primary)] flex items-center justify-center text-[var(--text-secondary)] hover:text-yellow-600 transition">
+                            <i class="fab fa-telegram text-xl"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-xl bg-[var(--bg-primary)] flex items-center justify-center text-[var(--text-secondary)] hover:text-yellow-600 transition">
+                            <i class="fab fa-vk text-xl"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-xl bg-[var(--bg-primary)] flex items-center justify-center text-[var(--text-secondary)] hover:text-yellow-600 transition">
+                            <i class="fab fa-instagram text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-[var(--border)] mt-8 pt-8 text-center text-sm text-[var(--text-secondary)]">
+                © 2025 Easy Movie. Все права защищены.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Блок для скриптов -->
+    {% block scripts %}{% endblock %}
+</body>
+</html>

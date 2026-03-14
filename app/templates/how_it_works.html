@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Заголовок -->
+<div class="text-center mb-12">
+    <h1 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-3">Как это работает</h1>
+    <p class="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+        Всего 4 простых шага отделяют тебя от первых мандаринов
+    </p>
+</div>
+
+<!-- Схема работы (визуальная) -->
+<div class="relative mb-16">
+    <!-- Линия-связка (для десктопа) -->
+    <div class="hidden md:block absolute top-24 left-0 w-full h-0.5 bg-yellow-200 dark:bg-gray-700"></div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 relative">
+        <!-- Шаг 1 -->
+        <div class="card p-6 text-center relative z-10">
+            <div class="w-16 h-16 bg-yellow-500 rounded-2xl flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4 shadow-lg transform -rotate-3">
+                1
+            </div>
+            <div class="w-12 h-12 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center text-2xl mx-auto mb-3">
+                📝
+            </div>
+            <h3 class="font-semibold text-lg text-gray-900 dark:text-white mb-2">Регистрация</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+                Создай аккаунт за 1 минуту. Можно через Google или email
+            </p>
+            <div class="mt-3 text-xs text-yellow-600 font-medium">
+                Бонус: +50 🍊
+            </div>
+        </div>
+
+        <!-- Шаг 2 -->
+        <div class="card p-6 text-center relative z-10 md:mt-8">
+            <div class="w-16 h-16 bg-yellow-500 rounded-2xl flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4 shadow-lg transform rotate-3">
+                2
+            </div>
+            <div class="w-12 h-12 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center text-2xl mx-auto mb-3">
+                🔍
+            </div>
+            <h3 class="font-semibold text-lg text-gray-900 dark:text-white mb-2">Выбери задание</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+                150+ заданий: карты, регистрации, вакансии
+            </p>
+        </div>
+
+        <!-- Шаг 3 -->
+        <div class="card p-6 text-center relative z-10">
+            <div class="w-16 h-16 bg-yellow-500 rounded-2xl flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4 shadow-lg transform -rotate-6">
+                3
+            </div>
+            <div class="w-12 h-12 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center text-2xl mx-auto mb-3">
+                ✅
+            </div>
+            <h3 class="font-semibold text-lg text-gray-900 dark:text-white mb-2">Выполни</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+                Следуй инструкции. Обычно занимает 5-10 минут
+            </p>
+        </div>
+
+        <!-- Шаг 4 -->
+        <div class="card p-6 text-center relative z-10 md:mt-8">
+            <div class="w-16 h-16 bg-yellow-500 rounded-2xl flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4 shadow-lg transform rotate-12">
+                4
+            </div>
+            <div class="w-12 h-12 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center text-2xl mx-auto mb-3">
+                💰
+            </div>
+            <h3 class="font-semibold text-lg text-gray-900 dark:text-white mb-2">Получи бонус</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+                Мандарины зачисляются на баланс. Копи или выводи
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Детальное описание -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+    <!-- Левая колонка -->
+    <div class="space-y-4">
+        <div class="card p-5 flex items-start space-x-4">
+            <div class="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center text-green-600 text-xl flex-shrink-0">
+                ✓
+            </div>
+            <div>
+                <h4 class="font-semibold text-gray-900 dark:text-white mb-1">Никаких вложений</h4>
+                <p class="text-sm text-gray-600 dark:text-gray-400">Все задания бесплатны. Ты ничего не теряешь, только зарабатываешь</p>
+            </div>
+        </div>
+
+        <div class="card p-5 flex items-start space-x-4">
+            <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center text-blue-600 text-xl flex-shrink-0">
+                ⚡
+            </div>
+            <div>
+                <h4 class="font-semibold text-gray-900 dark:text-white mb-1">Мгновенное начисление</h4>
+                <p class="text-sm text-gray-600 dark:text-gray-400">После выполнения задания мандарины сразу поступают на холд</p>
+            </div>
+        </div>
+
+        <div class="card p-5 flex items-start space-x-4">
+            <div class="w-10 h-10 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center text-purple-600 text-xl flex-shrink-0">
+                🎯
+            </div>
+            <div>
+                <h4 class="font-semibold text-gray-900 dark:text-white mb-1">Выбор по возрасту</h4>
+                <p class="text-sm text-gray-600 dark:text-gray-400">Задания разделены на 14+ и 18+. Только то, что доступно</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Правая колонка -->
+    <div class="space-y-4">
+        <div class="card p-5 flex items-start space-x-4">
+            <div class="w-10 h-10 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex items-center justify-center text-yellow-600 text-xl flex-shrink-0">
+                📱
+            </div>
+            <div>
+                <h4 class="font-semibold text-gray-900 dark:text-white mb-1">Работает везде</h4>
+                <p class="text-sm text-gray-600 dark:text-gray-400">С компьютера, планшета или телефона — где удобно</p>
+            </div>
+        </div>
+
+        <div class="card p-5 flex items-start space-x-4">
+            <div class="w-10 h-10 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center text-red-600 text-xl flex-shrink-0">
+                🏦
+            </div>
+            <div>
+                <h4 class="font-semibold text-gray-900 dark:text-white mb-1">Вывод на карту</h4>
+                <p class="text-sm text-gray-600 dark:text-gray-400">Мандарины можно вывести на карту любого банка</p>
+            </div>
+        </div>
+
+        <div class="card p-5 flex items-start space-x-4">
+            <div class="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg flex items-center justify-center text-indigo-600 text-xl flex-shrink-0">
+                👥
+            </div>
+            <div>
+                <h4 class="font-semibold text-gray-900 dark:text-white mb-1">Реферальная система</h4>
+                <p class="text-sm text-gray-600 dark:text-gray-400">Приглашай друзей и получай процент с их заработка</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- FAQ Быстрый -->
+<div class="card p-6">
+    <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-6">Частые вопросы</h2>
+    
+    <div class="space-y-4">
+        <div class="border-b border-gray-200 dark:border-gray-700 pb-4">
+            <h5 class="font-medium text-gray-900 dark:text-white mb-2">Сколько можно заработать?</h5>
+            <p class="text-sm text-gray-600 dark:text-gray-400">В среднем пользователи зарабатывают 1000-3000 мандаринов в месяц. Всё зависит от времени, которое вы готовы уделять заданиям.</p>
+        </div>
+        
+        <div class="border-b border-gray-200 dark:border-gray-700 pb-4">
+            <h5 class="font-medium text-gray-900 dark:text-white mb-2">Как вывести мандарины?</h5>
+            <p class="text-sm text-gray-600 dark:text-gray-400">Мандарины можно обменять на рубли и вывести на карту любого российского банка. Минимальная сумма вывода — 500 мандаринов.</p>
+        </div>
+        
+        <div class="border-b border-gray-200 dark:border-gray-700 pb-4">
+            <h5 class="font-medium text-gray-900 dark:text-white mb-2">Это безопасно?</h5>
+            <p class="text-sm text-gray-600 dark:text-gray-400">Да, мы работаем только с официальными партнерами. Ваши данные в безопасности.</p>
+        </div>
+        
+        <div>
+            <h5 class="font-medium text-gray-900 dark:text-white mb-2">Что делать, если возникли проблемы?</h5>
+            <p class="text-sm text-gray-600 dark:text-gray-400">Напишите в поддержку, мы отвечаем в течение 15 минут в рабочее время.</p>
+        </div>
+    </div>
+</div>
+
+<!-- CTA -->
+<div class="mt-8 text-center">
+    <a href="/register" class="btn-primary inline-flex items-center space-x-2 px-8 py-3 text-lg">
+        <span>Начать зарабатывать</span>
+        <i class="fas fa-arrow-right"></i>
+    </a>
+</div>
+{% endblock %}
