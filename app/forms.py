@@ -1,14 +1,15 @@
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileField, FileAllowed
 from wtforms import StringField, PasswordField, DateField
 from wtforms.validators import DataRequired, Email, Length, EqualTo, ValidationError
 from app.models import User
-from flask_wtf.file import FileField, FileAllowed
 
 class ProfileForm(FlaskForm):
     username = StringField('Имя пользователя', validators=[DataRequired(), Length(min=2, max=20)])
     phone = StringField('Телефон')
     birth_date = DateField('Дата рождения', format='%Y-%m-%d')
-    avatar = FileField('Аватар', validators=[FileAllowed(['jpg', 'png', 'jpeg'], 'Только изображения!')])
+    avatar = FileField('Аватар', validators=[FileAllowed(['jpg', 'png', 'jpeg', 'gif'], 'Только изображения!')])
+
 class RegistrationForm(FlaskForm):
     username = StringField('Имя пользователя', validators=[DataRequired(), Length(min=2, max=20)])
     email = StringField('Email', validators=[DataRequired(), Email()])
