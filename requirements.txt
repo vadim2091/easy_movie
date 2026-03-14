@@ -1,6 +1,6 @@
 flask==2.3.3
 flask-sqlalchemy==3.1.1
-flask-login==0.6.2
+flask-login==0.6.3
 flask-socketio==5.3.4
 eventlet==0.33.3
 flask-admin==1.6.1
@@ -10,5 +10,6 @@ python-dotenv==1.0.0
 flask-wtf==1.2.1
 email-validator==2.1.0
 pillow==10.4.0
-psycopg2-binary==2.9.7
+psycopg2-binary==2.9.9
 setuptools==75.1.0
+werkzeug==2.3.8
