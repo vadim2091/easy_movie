@@ -47,6 +47,7 @@ def handle_message(data):
     emit('new_message', response, broadcast=True)
     
 # Отправляем в Telegram
+"""
 if not current_user.is_admin:
     try:
         from app.telegram_bot import send_to_admin
@@ -67,7 +68,7 @@ if not current_user.is_admin:
         print(f"📱 Отправлено в Telegram: {message}")
     except Exception as e:
         print(f"❌ Ошибка: {e}")
-        
+  """      
 @socketio.on('typing')
 def handle_typing(data):
     if not current_user.is_authenticated:
