@@ -60,7 +60,7 @@ def profile():
                          transactions=transactions,
                          stats=stats)
 
-                    @profile_bp.route('/upload-avatar', methods=['POST'])
+@profile_bp.route('/upload-avatar', methods=['POST'])
 @login_required
 def upload_avatar():
     if 'avatar' not in request.files:
