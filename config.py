@@ -17,5 +17,5 @@ class Config:
     ADMIN_TELEGRAM_CHAT_ID = os.environ.get('ADMIN_TELEGRAM_CHAT_ID')
 
     # Upload folder for avatars
-    UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'app/static/uploads')
+ UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'app/static/uploads')
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB

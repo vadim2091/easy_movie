@@ -4,8 +4,9 @@ from app import db
 from app.models import User, UserTask, Transaction
 from app.forms import ProfileForm
 from datetime import datetime
-
-profile_bp = Blueprint('profile', __name__)
+import os
+from werkzeug.utils import secure_filename
+from flask import current_app
 
 @profile_bp.route('/profile', methods=['GET', 'POST'])
 @login_required
@@ -13,12 +14,25 @@ def profile():
     form = ProfileForm(obj=current_user)
     
     if form.validate_on_submit():
+        current_user.username = form.username.data
         current_user.phone = form.phone.data
         current_user.birth_date = form.birth_date.data
-        current_user.last_seen = datetime.utcnow()
+        
+        # Обработка аватарки
+        if form.avatar.data:
+            file = form.avatar.data
+            filename = secure_filename(file.filename)
+            # Уникальное имя
+            ext = filename.split('.')[-1]
+            new_filename = f"avatar_{current_user.id}_{secrets.token_hex(8)}.{ext}"
+            file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], new_filename))
+            current_user.avatar = new_filename
+        
         db.session.commit()
         flash('Профиль обновлен!', 'success')
         return redirect(url_for('profile.profile'))
+    
+    
     
     # Статистика
     user_tasks = UserTask.query.filter_by(user_id=current_user.id).all()
@@ -45,3 +59,32 @@ def profile():
                          user_tasks=user_tasks,
                          transactions=transactions,
                          stats=stats)
+
+                    @profile_bp.route('/upload-avatar', methods=['POST'])
+@login_required
+def upload_avatar():
+    if 'avatar' not in request.files:
+        return {'success': False, 'error': 'Нет файла'}
+    
+    file = request.files['avatar']
+    if file.filename == '':
+        return {'success': False, 'error': 'Файл не выбран'}
+    
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        ext = filename.split('.')[-1]
+        new_filename = f"avatar_{current_user.id}_{secrets.token_hex(8)}.{ext}"
+        file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], new_filename))
+        
+        # Удаляем старый аватар если не default
+        if current_user.avatar != 'default.jpg':
+            try:
+                os.remove(os.path.join(current_app.config['UPLOAD_FOLDER'], current_user.avatar))
+            except:
+                pass
+        
+        current_user.avatar = new_filename
+        db.session.commit()
+        return {'success': True}
+    
+    return {'success': False, 'error': 'Недопустимый формат'}
