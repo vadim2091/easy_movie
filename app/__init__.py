@@ -47,5 +47,7 @@ def create_app():
     
     # SocketIO
     socketio.init_app(app, cors_allowed_origins="*")
+    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+    
     
     return app
