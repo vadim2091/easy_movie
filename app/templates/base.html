@@ -1,14 +1,8 @@
 <!DOCTYPE html>
-<html lang="ru" x-data="{ 
-    theme: localStorage.getItem('theme') || 'light',
-    mobileMenuOpen: false 
-}" :class="theme">
+<html lang="ru" class="dark">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <meta charset="UTF-8">
-   <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Easy Movie - Зарабатывай мандарины</title>
     
     <!-- Шрифты -->
@@ -18,122 +12,299 @@
     <!-- Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Alpine.js -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <!-- AOS анимации -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     
     <style>
-   /* ===== АДАПТИВНОСТЬ ===== */
-/* Базовые стили для всех устройств */
-* {
-    box-sizing: border-box;
-}
-
-html, body {
-    overflow-x: hidden;
-    width: 100%;
-    position: relative;
-}
-
-.container, .max-w-7xl {
-    max-width: 100%;
-    padding-left: 1rem;
-    padding-right: 1rem;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-/* Телефоны (до 640px) */
-@media (max-width: 640px) {
-    .container, .max-w-7xl {
-        padding-left: 1rem;
-        padding-right: 1rem;
-    }
-    
-    h1 {
-        font-size: 2rem !important;
-        line-height: 1.2 !important;
-    }
-    
-    h2 {
-        font-size: 1.5rem !important;
-    }
-    
-    .grid {
-        grid-template-columns: 1fr !important;
-        gap: 1rem !important;
-    }
-    
-    /* Карточки на всю ширину */
-    .card, [class*="rounded-2xl"] {
-        margin-left: 0 !important;
-        margin-right: 0 !important;
-        width: 100% !important;
-    }
-    
-    /* Кнопки на всю ширину */
-    .btn, .btn-primary, .btn-secondary,
-    button[class*="bg-"], a[class*="bg-"] {
-        width: 100%;
-        display: block;
-        text-align: center;
-        margin-bottom: 0.5rem;
-    }
-    
-    /* Навигация */
-    .navbar .flex {
-        flex-wrap: wrap;
-    }
-    
-    .navbar-menu {
-        width: 100%;
-        order: 3;
-    }
-    
-    /* Аватар и профиль */
-    .flex-col.md\:flex-row {
-        flex-direction: column !important;
-        align-items: center !important;
-        text-align: center !important;
-    }
-    
-    /* Таблицы */
-    .overflow-x-auto {
-        -webkit-overflow-scrolling: touch;
-    }
-    
-    /* Отступы */
-    .py-8 {
-        padding-top: 1rem !important;
-        padding-bottom: 1rem !important;
-    }
-    
-    .px-4 {
-        padding-left: 0.5rem !important;
-        padding-right: 0.5rem !important;
-    }
-}
-
-/* Планшеты (641px - 1024px) */
-@media (min-width: 641px) and (max-width: 1024px) {
-    .grid-cols-3, .lg\:grid-cols-3 {
-        grid-template-columns: repeat(2, 1fr) !important;
-    }
-    
-    .grid-cols-4, .lg\:grid-cols-4 {
-        grid-template-columns: repeat(2, 1fr) !important;
-    }
-    
-    .grid-cols-8, .lg\:grid-cols-8 {
-        grid-template-columns: repeat(4, 1fr) !important;
-    }
-}
-
-/* Десктоп (1025px+) */
-@media (min-width: 1025px) {
-    .container, .max-w-7xl {
-        max-width: 1280px;
-    }
-}
+        /* CSS переменные для темной темы */
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-tertiary: #64748b;
+            --border: #334155;
+            --hover: #334155;
+            --card-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        html, body {
+            overflow-x: hidden;
+            width: 100%;
+            position: relative;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Контейнеры */
+        .container, .max-w-7xl {
+            max-width: 100%;
+            padding-left: 1rem;
+            padding-right: 1rem;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        /* Навигация */
+        .navbar {
+            background-color: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            width: 100%;
+        }
+        
+        .nav-link {
+            color: var(--text-secondary);
+            padding: 0.5rem 1rem;
+            border-radius: 0.75rem;
+            transition: all 0.2s;
+            display: inline-block;
+        }
+        
+        .nav-link:hover {
+            color: #eab308;
+            background-color: var(--hover);
+        }
+        
+        /* Карточки */
+        .card {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            box-shadow: var(--card-shadow);
+            transition: all 0.2s;
+            padding: 1.5rem;
+        }
+        
+        .card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.5);
+        }
+        
+        /* Кнопки */
+        .btn-primary {
+            background: linear-gradient(135deg, #eab308, #f97316);
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 0.75rem;
+            transition: all 0.2s;
+            display: inline-block;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #ca8a04, #ea580c);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(234,179,8,0.3);
+        }
+        
+        .btn-secondary {
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            padding: 0.5rem 1.5rem;
+            border-radius: 0.75rem;
+            transition: all 0.2s;
+            display: inline-block;
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--hover);
+        }
+        
+        /* Бейдж баланса */
+        .balance-badge {
+            background: linear-gradient(135deg, #854d0e, #a16207);
+            color: #fef9c3;
+            padding: 0.25rem 0.75rem;
+            border-radius: 2rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        
+        /* Аватар */
+        .avatar {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 9999px;
+            background: linear-gradient(135deg, #eab308, #f97316);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+        
+        /* Футер */
+        .footer {
+            background-color: var(--bg-secondary);
+            border-top: 1px solid var(--border);
+            margin-top: auto;
+        }
+        
+        /* Мобильное меню */
+        .mobile-menu {
+            display: none;
+            position: absolute;
+            top: 4rem;
+            left: 0;
+            right: 0;
+            background-color: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem;
+            z-index: 40;
+        }
+        
+        .mobile-menu.active {
+            display: block;
+        }
+        
+        @media (min-width: 768px) {
+            .mobile-menu {
+                display: none !important;
+            }
+        }
+        
+        /* Дропдаун */
+        .dropdown {
+            position: relative;
+        }
+        
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            min-width: 200px;
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            margin-top: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.5);
+            z-index: 50;
+            display: none;
+        }
+        
+        .dropdown:hover .dropdown-menu {
+            display: block;
+        }
+        
+        .dropdown-item {
+            padding: 0.75rem 1rem;
+            color: var(--text-primary);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .dropdown-item:hover {
+            background-color: var(--hover);
+        }
+        
+        /* ===== АДАПТИВНОСТЬ ===== */
+        /* Телефоны (до 640px) */
+        @media (max-width: 640px) {
+            .container, .max-w-7xl {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+            
+            h1 {
+                font-size: 2rem !important;
+                line-height: 1.2 !important;
+            }
+            
+            h2 {
+                font-size: 1.5rem !important;
+            }
+            
+            .grid {
+                grid-template-columns: 1fr !important;
+                gap: 1rem !important;
+            }
+            
+            /* Карточки на всю ширину */
+            .card, [class*="rounded-2xl"] {
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+                width: 100% !important;
+            }
+            
+            /* Кнопки на всю ширину */
+            .btn, .btn-primary, .btn-secondary,
+            button[class*="bg-"], a[class*="bg-"] {
+                width: 100%;
+                display: block;
+                text-align: center;
+                margin-bottom: 0.5rem;
+            }
+            
+            /* Навигация */
+            .navbar .flex {
+                flex-wrap: wrap;
+            }
+            
+            .navbar-menu {
+                width: 100%;
+                order: 3;
+            }
+            
+            /* Аватар и профиль */
+            .flex-col.md\:flex-row {
+                flex-direction: column !important;
+                align-items: center !important;
+                text-align: center !important;
+            }
+            
+            /* Таблицы */
+            .overflow-x-auto {
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            /* Отступы */
+            .py-8 {
+                padding-top: 1rem !important;
+                padding-bottom: 1rem !important;
+            }
+            
+            .px-4 {
+                padding-left: 0.5rem !important;
+                padding-right: 0.5rem !important;
+            }
+        }
+        
+        /* Планшеты (641px - 1024px) */
+        @media (min-width: 641px) and (max-width: 1024px) {
+            .grid-cols-3, .lg\:grid-cols-3 {
+                grid-template-columns: repeat(2, 1fr) !important;
+            }
+            
+            .grid-cols-4, .lg\:grid-cols-4 {
+                grid-template-columns: repeat(2, 1fr) !important;
+            }
+            
+            .grid-cols-8, .lg\:grid-cols-8 {
+                grid-template-columns: repeat(4, 1fr) !important;
+            }
+        }
+        
+        /* Десктоп (1025px+) */
+        @media (min-width: 1025px) {
+            .container, .max-w-7xl {
+                max-width: 1280px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -165,11 +336,8 @@ html, body {
 
                 <!-- Правая часть -->
                 <div class="flex items-center space-x-3">
-                    <!-- Переключатель темы -->
-                    <button @click="theme = theme === 'light' ? 'dark' : 'light'; localStorage.setItem('theme', theme)" 
-                            class="theme-switch">
-                        <i x-show="theme === 'dark'" class="fas fa-sun text-yellow-500"></i>
-                    </button>
+                    <!-- Луна (темная тема фикс) -->
+                    <span class="text-yellow-500"><i class="fas fa-moon"></i></span>
 
                     {% if current_user.is_authenticated %}
                         <!-- Десктоп профиль -->
@@ -217,7 +385,7 @@ html, body {
                     {% endif %}
 
                     <!-- Кнопка мобильного меню -->
-                    <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden nav-link">
+                    <button onclick="document.querySelector('.mobile-menu').classList.toggle('active')" class="md:hidden nav-link">
                         <i class="fas fa-bars"></i>
                     </button>
                 </div>
@@ -225,13 +393,13 @@ html, body {
         </div>
 
         <!-- Мобильное меню -->
-        <div x-show="mobileMenuOpen" @click.away="mobileMenuOpen = false" class="mobile-menu" :class="{ 'active': mobileMenuOpen }">
+        <div class="mobile-menu">
             <div class="flex flex-col space-y-2">
-                <a href="/" class="nav-link block" @click="mobileMenuOpen = false">Главная</a>
-                <a href="/about" class="nav-link block" @click="mobileMenuOpen = false">О нас</a>
-                <a href="/tasks" class="nav-link block" @click="mobileMenuOpen = false">Задания</a>
-                <a href="/how-it-works" class="nav-link block" @click="mobileMenuOpen = false">Как это работает</a>
-                <a href="/support" class="nav-link block" @click="mobileMenuOpen = false">Поддержка</a>
+                <a href="/" class="nav-link block">Главная</a>
+                <a href="/about" class="nav-link block">О нас</a>
+                <a href="/tasks" class="nav-link block">Задания</a>
+                <a href="/how-it-works" class="nav-link block">Как это работает</a>
+                <a href="/support" class="nav-link block">Поддержка</a>
             </div>
         </div>
     </nav>
@@ -286,17 +454,20 @@ html, body {
         </div>
     </footer>
 
+    <!-- AOS анимации -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({
+            duration: 800,
+            once: true,
+            offset: 100
+        });
+    </script>
+
+    <!-- Падающие мандарины -->
+    <script src="{{ url_for('static', filename='js/mandarins.js') }}"></script>
+
     <!-- Блок для скриптов -->
     {% block scripts %}{% endblock %}
 </body>
-<!-- В самом конце перед </body> -->
-<script src="{{ url_for('static', filename='js/mandarins.js') }}"></script>
-<script>
-    AOS.init({
-        duration: 800,
-        once: true,
-        offset: 100
-    });
-</script>
-
 </html>
