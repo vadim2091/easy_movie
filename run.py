@@ -12,6 +12,7 @@ with app.app_context():
     
     # Создаем таблицы если их нет
     db.create_all()
+    print("✅ Таблицы проверены")
     
     # Создаем админа если нет
     if not User.query.filter_by(email='admin@yandex.ru').first():
@@ -24,19 +25,23 @@ with app.app_context():
         )
         db.session.add(admin)
         db.session.commit()
-        print("✅ Админ создан при запуске")
+        print("✅ Админ создан")
     
     # Создаем категории если нет
     if Category.query.count() == 0:
         categories = [
             Category(name='Дебетовые карты', slug='debit-cards', icon='💳', min_age=14, sort_order=1),
             Category(name='Кредитные карты', slug='credit-cards', icon='💳', min_age=18, sort_order=2),
+            Category(name='РКО', slug='business-accounts', icon='🏢', min_age=18, sort_order=3),
+            Category(name='ИП', slug='ip-registration', icon='💼', min_age=18, sort_order=4),
+            Category(name='Вакансии', slug='jobs', icon='🚚', min_age=18, sort_order=5),
         ]
         for cat in categories:
             db.session.add(cat)
         db.session.commit()
-        print("✅ Категории созданы при запуске")
+        print(f"✅ Добавлено {len(categories)} категорий")
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
-    socketio.run(app, host='0.0.0.0', port=port)
+    print(f"🚀 Сервер запущен на http://127.0.0.1:{port}")
+    socketio.run(app, debug=True, host='127.0.0.1', port=port)
