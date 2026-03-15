@@ -13,6 +13,7 @@ def create_app():
     app.config['SECRET_KEY'] = 'your-secret-key-here'
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///easy_movie.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static', 'uploads')
     
     # ИНИЦИАЛИЗИРУЕМ
     db.init_app(app)
