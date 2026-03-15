@@ -131,18 +131,19 @@
     {% endif %}
 </div>
 
-<!-- Модальное окно задания -->
+<!-- Модальное окно задания -->    
 <div x-data="{ showModal: false, task: {} }" 
-     @open-task-modal.window="showModal = true; task = $event.detail" 
+     @open-task-modal.window="if($event.detail && $event.detail.id) { showModal = true; task = $event.detail; }"
      class="fixed inset-0 overflow-y-auto z-50" 
      x-show="showModal"
      x-cloak
+
      x-transition:enter="transition ease-out duration-300"
      x-transition:enter-start="opacity-0 scale-90"
      x-transition:enter-end="opacity-100 scale-100"
      x-transition:leave="transition ease-in duration-200"
      x-transition:leave-start="opacity-100 scale-100"
-     x-transition:leave-end="opacity-0 scale-90">
+     x-transition:leave-end="opacity-0 scale-90"> 
     
     <div class="flex items-center justify-center min-h-screen px-4">
         <div class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm" @click="showModal = false"></div>
@@ -209,10 +210,13 @@
 
 <script>
 function openTaskModal(taskId) {
+    if (!taskId) return; // Добавь эту проверку
     fetch(`/tasks/${taskId}`)
         .then(response => response.json())
         .then(task => {
-            window.dispatchEvent(new CustomEvent('open-task-modal', { detail: task }));
+            if (task && task.id) { // И эту
+                window.dispatchEvent(new CustomEvent('open-task-modal', { detail: task }));
+            }
         })
         .catch(error => console.error('Error:', error));
 }
