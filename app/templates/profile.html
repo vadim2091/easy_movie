@@ -5,14 +5,7 @@
     <!-- Шапка профиля с градиентом -->
     <div class="relative mb-8">
         <div class="h-48 rounded-3xl bg-gradient-to-r from-yellow-500 via-orange-500 to-red-500 shadow-xl"></div>
-        <!-- Аватар и инфо в колонку на мобилке -->
-<div class="flex flex-col md:flex-row md:items-end -mt-16 mb-6">
-
-<!-- Статистика: 2 колонки на мобилке -->
-<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-
-<!-- Основной контент: 1 колонка на мобилке -->
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
         <!-- Аватар и основная информация -->
        <!-- Аватар и основная информация -->
 <div class="absolute -bottom-16 left-8 flex items-end gap-6">
@@ -245,27 +238,6 @@ function toggleEdit() {
     } else {
         display.style.display = 'block';
         form.style.display = 'none';
-    }
-}
-</script>
-<script>
-function uploadAvatar(input) {
-    if (input.files && input.files[0]) {
-        let formData = new FormData();
-        formData.append('avatar', input.files[0]);
-        
-        fetch('/upload-avatar', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            } else {
-                alert('Ошибка загрузки: ' + data.error);
-            }
-        });
     }
 }
 </script>
