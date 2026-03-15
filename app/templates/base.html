@@ -30,7 +30,82 @@
             --hover: #f1f5f9;
             --card-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
-        
+        /* Мобильная адаптация - ТОЛЬКО ДЛЯ ЭКРАНОВ МЕНЬШЕ 640px */
+@media (max-width: 640px) {
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    
+    h1 {
+        font-size: 1.8rem !important;
+    }
+    
+    h2 {
+        font-size: 1.5rem !important;
+    }
+    
+    .btn, .btn-primary, .btn-secondary {
+        width: 100%;
+        text-align: center;
+        display: block;
+    }
+    
+    .grid {
+        gap: 1rem;
+    }
+    
+    /* Превращаем любую сетку в одноколоночную на мобилках */
+    .grid-cols-1, .grid-cols-2, .grid-cols-3, .grid-cols-4, .grid-cols-5, .grid-cols-6,
+    .md\:grid-cols-2, .md\:grid-cols-3, .md\:grid-cols-4,
+    .lg\:grid-cols-2, .lg\:grid-cols-3, .lg\:grid-cols-4, .lg\:grid-cols-8 {
+        grid-template-columns: 1fr !important;
+    }
+    
+    /* Аватар и инфо в колонку */
+    .flex-col.md\:flex-row {
+        flex-direction: column !important;
+        align-items: center !important;
+        text-align: center !important;
+    }
+    
+    /* Фильтры в колонку */
+    .flex-wrap.gap-4 {
+        flex-direction: column;
+    }
+    
+    .flex-wrap.gap-4 > * {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+    
+    /* Навигационное меню */
+    .navbar-menu {
+        width: 100%;
+    }
+    
+    /* Карточки */
+    .card {
+        padding: 1rem;
+    }
+    
+    /* Таблицы */
+    .table {
+        display: block;
+        overflow-x: auto;
+    }
+}
+
+/* Стили для планшетов (641px - 768px) */
+@media (min-width: 641px) and (max-width: 768px) {
+    .grid-cols-3, .lg\:grid-cols-3 {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+    
+    .grid-cols-4, .lg\:grid-cols-4, .lg\:grid-cols-8 {
+        grid-template-columns: repeat(3, 1fr) !important;
+    }
+}
         .dark {
             --bg-primary: #0f172a;
             --bg-secondary: #1e293b;
