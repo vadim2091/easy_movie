@@ -47,7 +47,7 @@ def handle_message(data):
     
     emit('new_message', response, broadcast=True)
 
-if not current_user.is_admin:
+
     try:
         from app.telegram_bot_simple import send_telegram_notification
         send_telegram_notification(
