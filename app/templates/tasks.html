@@ -132,18 +132,31 @@
 </div>
 
 <!-- Модальное окно задания -->    
-<div x-data="{ showModal: false, task: {} }" 
-     @open-task-modal.window="if($event.detail && $event.detail.id) { showModal = true; task = $event.detail; }"
+<div x-data="{ 
+        showModal: false, 
+        task: {},
+        init() {
+            console.log('🔍 Модалка инициализирована, showModal =', this.showModal);
+        }
+     }" 
+     @open-task-modal.window="
+        console.log('📢 ПОЛУЧЕНО СОБЫТИЕ open-task-modal', $event.detail);
+        if($event.detail && $event.detail.id) { 
+            showModal = true; 
+            task = $event.detail; 
+            console.log('✅ Модалка открыта для задания ID', task.id);
+        } else {
+            console.log('❌ Событие без id игнорируем');
+        }"
      class="fixed inset-0 overflow-y-auto z-50" 
      x-show="showModal"
      x-cloak
-
      x-transition:enter="transition ease-out duration-300"
      x-transition:enter-start="opacity-0 scale-90"
      x-transition:enter-end="opacity-100 scale-100"
      x-transition:leave="transition ease-in duration-200"
      x-transition:leave-start="opacity-100 scale-100"
-     x-transition:leave-end="opacity-0 scale-90"> 
+     x-transition:leave-end="opacity-0 scale-90">
     
     <div class="flex items-center justify-center min-h-screen px-4">
         <div class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm" @click="showModal = false"></div>
