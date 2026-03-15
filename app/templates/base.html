@@ -4,6 +4,7 @@
     mobileMenuOpen: false 
 }" :class="theme">
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Easy Movie - Зарабатывай мандарины</title>
@@ -70,6 +71,58 @@
             background-color: var(--hover);
         }
         
+        /* Мобильная адаптация */
+@media (max-width: 640px) {
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    
+    h1 {
+        font-size: 1.8rem !important;
+    }
+    
+    h2 {
+        font-size: 1.5rem !important;
+    }
+    
+    .btn, .btn-primary, .btn-secondary {
+        width: 100%;
+        text-align: center;
+    }
+    
+    .grid {
+        gap: 1rem;
+    }
+    
+    /* Карточки в 1 колонку */
+    .grid-cols-1\\/md\\:grid-cols-2\\/lg\\:grid-cols-3 {
+        grid-template-columns: 1fr !important;
+    }
+    
+    /* Аватар и инфо в колонку */
+    .profile-header {
+        flex-direction: column !important;
+        align-items: center !important;
+        text-align: center !important;
+    }
+    
+    /* Фильтры в строку */
+    .filters {
+        flex-wrap: wrap;
+    }
+    
+    .filters > * {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+}
+
+@media (min-width: 641px) and (max-width: 768px) {
+    .grid-cols-3 {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
         /* Карточки */
         .card {
             background-color: var(--bg-secondary);
