@@ -46,11 +46,10 @@ def handle_message(data):
     }
     
     emit('new_message', response, broadcast=True)
-    
-# В функции handle_message, после отправки в чат, добавь:
 
+if not current_user.is_admin:
     try:
-        # Отправляем в Telegram через простой requests
+        from app.telegram_bot_simple import send_telegram_notification
         send_telegram_notification(
             current_user.username,
             current_user.id,
@@ -59,7 +58,6 @@ def handle_message(data):
         print(f"📱 Уведомление отправлено: {message[:30]}...")
     except Exception as e:
         print(f"❌ Ошибка отправки: {e}")
-
         
 @socketio.on('typing')
 def handle_typing(data):
