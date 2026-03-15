@@ -298,7 +298,55 @@
                 grid-template-columns: repeat(4, 1fr) !important;
             }
         }
-        
+        /* Улучшаем хедер на телефонах */
+.navbar .container,
+.navbar .max-w-7xl {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+}
+
+.navbar .flex.justify-between {
+    flex-wrap: nowrap !important;          /* Лого и иконки в одной строке */
+    gap: 0.5rem;
+}
+
+.navbar .flex.items-center.space-x-8 {
+    flex-wrap: wrap;                        /* Лого и меню могут переноситься */
+    gap: 0.25rem;
+}
+
+.navbar .flex.items-center.space-x-3 {
+    flex-wrap: wrap;                        /* Правая часть (иконки, аватар) */
+    justify-content: flex-end;
+}
+
+/* Исправляем страницу поддержки */
+.flex.gap-6 {                               /* Основной контейнер чата */
+    flex-direction: column !important;
+}
+
+.flex.gap-6 > div:first-child {             /* Боковая панель (если есть) */
+    width: 100% !important;
+    order: 2;                                /* Перемещаем вниз */
+}
+
+.flex.gap-6 > div:last-child {              /* Окно чата */
+    width: 100% !important;
+    order: 1;
+}
+
+/* Поле ввода и кнопка на всю ширину */
+.flex.items-center.space-x-3 {
+    flex-wrap: wrap;
+}
+
+.flex.items-center.space-x-3 > input {
+    width: calc(100% - 60px) !important;    /* Учитываем кнопку */
+}
+
+.flex.items-center.space-x-3 > button {
+    width: 50px !important;                  /* Фиксированная ширина кнопки */
+}
         /* Десктоп (1025px+) */
         @media (min-width: 1025px) {
             .container, .max-w-7xl {
