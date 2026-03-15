@@ -48,7 +48,7 @@ def handle_message(data):
     emit('new_message', response, broadcast=True)
     
 # В функции handle_message, после отправки в чат, добавь:
-if not current_user.is_admin:
+
     try:
         # Отправляем в Telegram через простой requests
         send_telegram_notification(
