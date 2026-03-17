@@ -63,9 +63,11 @@ def handle_message(data):
         print(f"❌ Ошибка отправки: {e}")
         
         if not current_user.is_admin:
+         from app.telegram_bot import notify_admin
+    # Запускаем в отдельном потоке, чтобы не блокировать вебсокет
+    threading.Thread(target=notify_admin, args=(current_user.username, current_user.id, message), daemon=True).start()
 
 @socketio.on('typing')
-
 def handle_typing(data):
     if not current_user.is_authenticated:
         return
@@ -112,7 +114,4 @@ def load_chat_history():
     
     emit('chat_history', history, room=f"user_{current_user.id}")
 
-    if not current_user.is_admin:
-    from app.telegram_bot import notify_admin
-    # Запускаем в отдельном потоке, чтобы не блокировать вебсокет
-    threading.Thread(target=notify_admin, args=(current_user.username, current_user.id, message), daemon=True).start()
+    
