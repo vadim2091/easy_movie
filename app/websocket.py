@@ -2,11 +2,6 @@ from flask_socketio import SocketIO, emit, join_room, leave_room
 from flask_login import current_user
 from datetime import datetime
 import threading
-import requests
-from app.telegram_bot_simple import send_telegram_notification
-import asyncio
-import threading
-from app.telegram_bot import notify_admin  # функцию напишем позже
 
 socketio = SocketIO(cors_allowed_origins="*")
 
@@ -17,7 +12,46 @@ def get_db():
     from app import db
     return db
 
-# ... остальные функции (connect, disconnect) без изменений ...
+@socketio.on('connect')
+def handle_connect():
+    if current_user.is_authenticated:
+        user_room = f"user_{current_user.id}"
+        join_room(user_room)
+        
+        active_users[str(current_user.id)] = {
+            'id': current_user.id,
+            'username': current_user.username,
+            'time': datetime.now().strftime('%H:%M'),
+            'room': user_room
+        }
+        
+        print(f"✅ {current_user.username} подключился")
+        
+        if current_user.is_admin:
+            join_room(admin_room)
+            emit('active_users', active_users, room=admin_room)
+        else:
+            emit('user_connected', {
+                'id': current_user.id,
+                'username': current_user.username,
+                'time': datetime.now().strftime('%H:%M')
+            }, room=admin_room)
+        
+        load_chat_history()
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    if current_user.is_authenticated:
+        if str(current_user.id) in active_users:
+            del active_users[str(current_user.id)]
+        
+        if not current_user.is_admin:
+            emit('user_disconnected', {
+                'id': current_user.id,
+                'username': current_user.username
+            }, room=admin_room)
+        
+        print(f"❌ {current_user.username} отключился")
 
 @socketio.on('send_message')
 def handle_message(data):
@@ -49,23 +83,22 @@ def handle_message(data):
     }
     
     emit('new_message', response, broadcast=True)
-
-
-    try:
-        from app.telegram_bot_simple import send_telegram_notification
-        send_telegram_notification(
-            current_user.username,
-            current_user.id,
-            message
-        )
-        print(f"📱 Уведомление отправлено: {message[:30]}...")
-    except Exception as e:
-        print(f"❌ Ошибка отправки: {e}")
-        
-        if not current_user.is_admin:
-         from app.telegram_bot import notify_admin
-    # Запускаем в отдельном потоке, чтобы не блокировать вебсокет
-    threading.Thread(target=notify_admin, args=(current_user.username, current_user.id, message), daemon=True).start()
+    
+    # Отправляем уведомление в Telegram, если сообщение от обычного пользователя (не админа)
+    if not current_user.is_admin:
+        try:
+            # Импорт внутри функции, чтобы избежать циклического импорта
+            from app.telegram_utils import notify_admin
+            # Запускаем в отдельном потоке, чтобы не блокировать вебсокет
+            thread = threading.Thread(
+                target=notify_admin,
+                args=(current_user.username, current_user.id, message),
+                daemon=True
+            )
+            thread.start()
+            print(f"📱 Уведомление отправлено в Telegram: {message[:30]}...")
+        except Exception as e:
+            print(f"❌ Ошибка отправки в Telegram: {e}")
 
 @socketio.on('typing')
 def handle_typing(data):
@@ -113,5 +146,3 @@ def load_chat_history():
         })
     
     emit('chat_history', history, room=f"user_{current_user.id}")
-
-    
