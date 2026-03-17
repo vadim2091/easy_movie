@@ -13,3 +13,4 @@ pillow==10.4.0
 psycopg2-binary==2.9.9
 setuptools==75.1.0
 werkzeug==2.3.8
+python-telegram-bot==20.7
