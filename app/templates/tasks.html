@@ -89,10 +89,19 @@
                     </span>
                 </div>
                 
-                <!-- ПОЛНОЕ ОПИСАНИЕ (без обрезки) -->
-                <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
-                    {{ task.description }}
-                </p>
+                <!-- ОПИСАНИЕ С ВОЗМОЖНОСТЬЮ РАЗВОРОТА -->
+                <div x-data="{ expanded: false }" class="mb-4">
+                    <p class="text-gray-600 dark:text-gray-400 text-sm">
+                        <span x-show="!expanded">{{ task.description|truncate(150, True, '...') }}</span>
+                        <span x-show="expanded">{{ task.description }}</span>
+                    </p>
+                    {% if task.description|length > 150 %}
+                    <button @click="expanded = !expanded" class="text-yellow-600 hover:text-yellow-700 text-sm font-medium mt-1 focus:outline-none">
+                        <span x-show="!expanded">ещё...</span>
+                        <span x-show="expanded">скрыть</span>
+                    </button>
+                    {% endif %}
+                </div>
                 
                 <div class="flex items-center justify-between mb-4">
                     <span class="px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded-full text-xs text-gray-600 dark:text-gray-400">
@@ -140,6 +149,61 @@
         <p class="text-gray-500">Загляни позже, они обязательно появятся!</p>
     </div>
     {% endif %}
+</div>
+
+<!-- ===== ФЕЙКОВЫЕ ОТЗЫВЫ ===== -->
+<div class="max-w-7xl mx-auto px-4 py-12 border-t border-gray-200 dark:border-gray-700">
+    <h2 class="text-3xl font-bold text-center mb-8">Отзывы наших пользователей</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Отзыв 1 -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
+            <div class="flex items-center mb-4">
+                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-white font-bold text-xl mr-4">
+                    А
+                </div>
+                <div>
+                    <h4 class="font-semibold">Анна С.</h4>
+                    <div class="flex text-yellow-400">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                </div>
+            </div>
+            <p class="text-gray-600 dark:text-gray-400 text-sm">"Очень удобный сервис! Задания простые, мандарины копятся быстро. Уже вывел 1500₽ на карту. Всем советую!"</p>
+            <p class="text-xs text-gray-500 mt-3">12 марта 2026</p>
+        </div>
+        <!-- Отзыв 2 -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
+            <div class="flex items-center mb-4">
+                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-bold text-xl mr-4">
+                    Д
+                </div>
+                <div>
+                    <h4 class="font-semibold">Дмитрий К.</h4>
+                    <div class="flex text-yellow-400">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
+                    </div>
+                </div>
+            </div>
+            <p class="text-gray-600 dark:text-gray-400 text-sm">"Оформлял карту по заданию – получил 2200 мандаринов. Всё честно, поддержка отвечает быстро. Минус – иногда долго проверяют."</p>
+            <p class="text-xs text-gray-500 mt-3">8 марта 2026</p>
+        </div>
+        <!-- Отзыв 3 -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
+            <div class="flex items-center mb-4">
+                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white font-bold text-xl mr-4">
+                    Е
+                </div>
+                <div>
+                    <h4 class="font-semibold">Елена В.</h4>
+                    <div class="flex text-yellow-400">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                </div>
+            </div>
+            <p class="text-gray-600 dark:text-gray-400 text-sm">"Лучший сайт для дополнительного заработка! Уже пригласила двоих друзей – получила бонусы. Мандарины реально выводятся."</p>
+            <p class="text-xs text-gray-500 mt-3">2 марта 2026</p>
+        </div>
+    </div>
 </div>
 
 <!-- Модальное окно задания (закомментировано) -->
