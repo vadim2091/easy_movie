@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 
 {% block content %}
-
 <div class="max-w-7xl mx-auto px-4 py-8">
     <!-- Заголовок с поиском -->
     <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
@@ -9,11 +8,8 @@
             Задания 🍊
         </h1>
         
-        <!-- Поиск -->
         <form method="GET" class="flex gap-2">
-            <input type="text" 
-                   name="search" 
-                   value="{{ current_search }}"
+            <input type="text" name="search" value="{{ current_search }}"
                    placeholder="Поиск заданий..." 
                    class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
             <button type="submit" class="bg-yellow-500 text-white px-6 py-2 rounded-lg hover:bg-yellow-600">
@@ -26,33 +22,20 @@
     <div class="flex flex-wrap gap-4 mb-6">
         <div class="flex items-center space-x-2 bg-white dark:bg-gray-800 rounded-lg p-1">
             <a href="{{ url_for('tasks.tasks_list', min_age=14, category=current_category, sort=current_sort, search=current_search) }}" 
-               class="px-4 py-2 rounded-lg {% if current_min_age == 14 %}bg-yellow-500 text-white{% else %}hover:bg-gray-100 dark:hover:bg-gray-700{% endif %}">
-                14+
-            </a>
+               class="px-4 py-2 rounded-lg {% if current_min_age == 14 %}bg-yellow-500 text-white{% else %}hover:bg-gray-100 dark:hover:bg-gray-700{% endif %}">14+</a>
             <a href="{{ url_for('tasks.tasks_list', min_age=18, category=current_category, sort=current_sort, search=current_search) }}" 
-               class="px-4 py-2 rounded-lg {% if current_min_age == 18 %}bg-yellow-500 text-white{% else %}hover:bg-gray-100 dark:hover:bg-gray-700{% endif %}">
-                18+
-            </a>
+               class="px-4 py-2 rounded-lg {% if current_min_age == 18 %}bg-yellow-500 text-white{% else %}hover:bg-gray-100 dark:hover:bg-gray-700{% endif %}">18+</a>
             <a href="{{ url_for('tasks.tasks_list', category=current_category, sort=current_sort, search=current_search) }}" 
-               class="px-4 py-2 rounded-lg {% if not current_min_age %}bg-yellow-500 text-white{% else %}hover:bg-gray-100 dark:hover:bg-gray-700{% endif %}">
-                Все
-            </a>
+               class="px-4 py-2 rounded-lg {% if not current_min_age %}bg-yellow-500 text-white{% else %}hover:bg-gray-100 dark:hover:bg-gray-700{% endif %}">Все</a>
         </div>
 
-        <!-- Сортировка -->
         <select name="sort" onchange="window.location.href=this.value" class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2">
             <option value="{{ url_for('tasks.tasks_list', sort='newest', category=current_category, min_age=current_min_age, search=current_search) }}" 
-                    {% if current_sort == 'newest' %}selected{% endif %}>
-                🔄 Сначала новые
-            </option>
+                    {% if current_sort == 'newest' %}selected{% endif %}>🔄 Сначала новые</option>
             <option value="{{ url_for('tasks.tasks_list', sort='price_desc', category=current_category, min_age=current_min_age, search=current_search) }}"
-                    {% if current_sort == 'price_desc' %}selected{% endif %}>
-                💰 Сначала дорогие
-            </option>
+                    {% if current_sort == 'price_desc' %}selected{% endif %}>💰 Сначала дорогие</option>
             <option value="{{ url_for('tasks.tasks_list', sort='price_asc', category=current_category, min_age=current_min_age, search=current_search) }}"
-                    {% if current_sort == 'price_asc' %}selected{% endif %}>
-                💸 Сначала дешевые
-            </option>
+                    {% if current_sort == 'price_asc' %}selected{% endif %}>💸 Сначала дешевые</option>
         </select>
     </div>
 
@@ -63,7 +46,6 @@
             <span class="text-2xl block mb-1">📋</span>
             <span class="font-medium text-sm">Все</span>
         </a>
-        
         {% for category in categories %}
         <a href="{{ url_for('tasks.tasks_list', category=category.slug, min_age=current_min_age, sort=current_sort, search=current_search) }}" 
            class="bg-white dark:bg-gray-800 p-4 rounded-xl text-center hover:scale-105 transition shadow-md {% if current_category == category.slug %}ring-2 ring-yellow-500{% endif %}">
@@ -89,7 +71,8 @@
                     </span>
                 </div>
                 
-                <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
+                <!-- Описание с обрезкой до двух строк -->
+                <p class="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-2">
                     {{ task.description }}
                 </p>
                 
@@ -98,6 +81,16 @@
                         {{ task.category.icon if task.category else '📋' }} {{ task.category.name if task.category else 'Задание' }}
                     </span>
                 </div>
+
+                <!-- ПРЕДУПРЕЖДЕНИЕ (только для карт) -->
+                {% if task.category and task.category.slug in ['debit-cards', 'credit-cards'] %}
+                <div class="mb-4 p-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                    <p class="text-xs text-red-600 dark:text-red-400 flex items-center">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                        Если вы не выполните условия, вывод будет заблокирован.
+                    </p>
+                </div>
+                {% endif %}
                 
                 <div class="flex justify-between items-center">
                     <div class="text-2xl font-bold text-yellow-600">
@@ -118,39 +111,19 @@
                 </div>
             </div>
         </div>
+        {% else %}
+        <div class="text-center py-12 col-span-3">
+            <div class="text-6xl mb-4">😕</div>
+            <h3 class="text-2xl font-bold text-gray-700 dark:text-gray-300 mb-2">Заданий пока нет</h3>
+            <p class="text-gray-500">Загляни позже, они обязательно появятся!</p>
+        </div>
         {% endfor %}
     </div>
-
-    <!-- Если заданий нет -->
-    {% if not tasks %}
-    <div class="text-center py-12">
-        <div class="text-6xl mb-4">😕</div>
-        <h3 class="text-2xl font-bold text-gray-700 dark:text-gray-300 mb-2">Заданий пока нет</h3>
-        <p class="text-gray-500">Загляни позже, они обязательно появятся!</p>
-    </div>
-    {% endif %}
 </div>
 
-<!-- Модальное окно задания -->    
-
-<!-- <div x-data="{ 
-        showModal: false, 
-        task: {},
-        init() {
-            console.log('🔧 Модалка инициализирована. showModal =', this.showModal);
-            // Следим за изменением showModal
-            this.$watch('showModal', value => console.log('👁️ showModal изменился на', value));
-        }
-     }" 
-     @open-task-modal.window="
-        console.log('📢 ПОЛУЧЕНО СОБЫТИЕ open-task-modal', $event.detail);
-        if($event.detail && $event.detail.id) { 
-            showModal = true; 
-            task = $event.detail; 
-            console.log('✅ М одалка открыта для задания ID', task.id);
-        } else {
-            console.warn('⚠️ СОБЫТИЕ БЕЗ ID ИГНОРИРУЕМ', $event.detail);
-        }"
+<!-- Модальное окно задания (оставляем как есть, с полным текстом) -->
+<div x-data="{ showModal: false, task: {} }" 
+     @open-task-modal.window="if($event.detail && $event.detail.id) { showModal = true; task = $event.detail; }"
      class="fixed inset-0 overflow-y-auto z-50" 
      x-show="showModal"
      x-cloak
@@ -160,8 +133,8 @@
      x-transition:leave="transition ease-in duration-200"
      x-transition:leave-start="opacity-100 scale-100"
      x-transition:leave-end="opacity-0 scale-90">
-     -->
-<!--     <div class="flex items-center justify-center min-h-screen px-4">
+    
+    <div class="flex items-center justify-center min-h-screen px-4">
         <div class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm" @click="showModal = false"></div>
         
         <div class="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-2xl transform transition-all max-w-lg w-full relative z-50">
@@ -169,7 +142,7 @@
             
             <div class="px-6 py-6">
                 <div class="flex justify-between items-start mb-4">
-                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white" x-text="task.title || 'Загрузка...'"></h3>
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white" x-text="task.title"></h3>
                     <button @click="showModal = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -178,7 +151,8 @@
                 </div>
                 
                 <div class="space-y-4">
-                    <p class="text-gray-600 dark:text-gray-400" x-text="task.description || ''"></p>
+                    <!-- ПОЛНОЕ ОПИСАНИЕ -->
+                    <p class="text-gray-600 dark:text-gray-400 whitespace-pre-line" x-text="task.description"></p>
                     
                     <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-4">
                         <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">
@@ -226,11 +200,11 @@
 
 <script>
 function openTaskModal(taskId) {
-    if (!taskId) return; // Добавь эту проверку
+    if (!taskId) return;
     fetch(`/tasks/${taskId}`)
         .then(response => response.json())
         .then(task => {
-            if (task && task.id) { // И эту
+            if (task && task.id) {
                 window.dispatchEvent(new CustomEvent('open-task-modal', { detail: task }));
             }
         })
@@ -250,5 +224,14 @@ function acceptTask(taskId) {
         })
         .catch(error => console.error('Error:', error));
 }
-</script> -->
+</script>
+
+<style>
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+</style>
 {% endblock %}
