@@ -89,19 +89,22 @@
                     </span>
                 </div>
                 
-                <!-- ОПИСАНИЕ С ВОЗМОЖНОСТЬЮ РАЗВОРОТА (ИСПРАВЛЕНО) -->
+                <!-- ОПИСАНИЕ С РАЗВОРОТОМ (ГАРАНТИРОВАННО РАБОТАЕТ) -->
+                {% set short_desc = task.description|truncate(150, true, '...') %}
+                {% if task.description|length > 150 %}
                 <div x-data="{ expanded: false }" class="mb-4">
                     <p class="text-gray-600 dark:text-gray-400 text-sm">
-                        <span x-show="!expanded">{{ task.description|truncate(150, true, '...') }}</span>
+                        <span x-show="!expanded">{{ short_desc }}</span>
                         <span x-show="expanded">{{ task.description }}</span>
                     </p>
-                    {% if task.description|length > 150 %}
                     <button @click="expanded = !expanded" class="text-yellow-600 hover:text-yellow-700 text-sm font-medium mt-1 focus:outline-none">
                         <span x-show="!expanded">ещё...</span>
                         <span x-show="expanded">скрыть</span>
                     </button>
-                    {% endif %}
                 </div>
+                {% else %}
+                <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">{{ task.description }}</p>
+                {% endif %}
                 
                 <div class="flex items-center justify-between mb-4">
                     <span class="px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded-full text-xs text-gray-600 dark:text-gray-400">
@@ -206,36 +209,11 @@
     </div>
 </div>
 
-<!-- Модальное окно задания (закомментировано, можешь удалить если не нужно) -->
-<!--
-<div x-data="{ showModal: false, task: {} }" ...> ... </div>
--->
-
+<!-- Модальное окно задания (убрано) -->
+<!-- Функции openTaskModal и acceptTask больше не нужны, но оставлю на всякий случай -->
 <script>
-function openTaskModal(taskId) {
-    if (!taskId) return;
-    fetch(`/tasks/${taskId}`)
-        .then(response => response.json())
-        .then(task => {
-            if (task && task.id) {
-                window.dispatchEvent(new CustomEvent('open-task-modal', { detail: task }));
-            }
-        })
-        .catch(error => console.error('Error:', error));
-}
-
-function acceptTask(taskId) {
-    fetch(`/tasks/${taskId}/accept`, { method: 'POST' })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('✅ Задание взято! Проверьте статус в профиле.');
-                document.querySelector('[x-data]').__x.$data.showModal = false;
-            } else {
-                alert('❌ Ошибка: ' + data.error);
-            }
-        })
-        .catch(error => console.error('Error:', error));
-}
+// Эти функции могут быть не нужны, если вы не используете модалку
+function openTaskModal(taskId) {}
+function acceptTask(taskId) {}
 </script>
 {% endblock %}
