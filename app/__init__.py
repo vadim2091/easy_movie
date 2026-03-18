@@ -14,16 +14,19 @@ def create_app():
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static', 'uploads')
 
+    # === 1. Инициализация расширений ===
     db.init_app(app)
     login_manager.init_app(app)
     login_manager.login_view = 'auth.login'
     socketio.init_app(app, cors_allowed_origins="*")
 
+    # === 2. Загрузчик пользователя (должен быть после инициализации db) ===
     from app.models import User
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(int(user_id))
 
+    # === 3. Регистрация blueprint'ов ===
     from app.routes.auth import auth_bp
     from app.routes.tasks import tasks_bp
     from app.routes.profile import profile_bp
@@ -36,6 +39,7 @@ def create_app():
     app.register_blueprint(main_bp)
     app.register_blueprint(support_bp)
 
+    # === 4. Админка ===
     try:
         from app.admin import init_admin
         init_admin(app)
@@ -43,12 +47,16 @@ def create_app():
     except Exception as e:
         print(f"❌ Ошибка админки: {e}")
 
+    # === 5. Создание таблиц и наполнение данными (в контексте приложения) ===
     with app.app_context():
+        # Сначала создаём таблицы
         db.create_all()
         print("✅ Таблицы созданы (если не существовали)")
 
+        # Теперь импортируем модели внутри контекста
         from app.models import Category, Task, User
         from werkzeug.security import generate_password_hash
+        import random
 
         # === СОЗДАЁМ АДМИНА ЕСЛИ НЕТ ===
         admin = User.query.filter_by(email='admin@yandex.ru').first()
@@ -98,6 +106,8 @@ def create_app():
                     min_age=14,
                     requirements='Паспорт РФ',
                     instructions='https://trk.ppdu.ru/click/sWjR7kOv',
+                    rating=round(random.uniform(4.2, 5.0), 1),
+                    completed_count=random.randint(50, 500),
                     is_active=True
                 ),
                 Task(
@@ -111,6 +121,8 @@ def create_app():
                     min_age=14,
                     requirements='Паспорт РФ, 14+',
                     instructions='https://trk.ppdu.ru/click/dBXaBPbP',
+                    rating=round(random.uniform(4.0, 4.9), 1),
+                    completed_count=random.randint(50, 500),
                     is_active=True
                 ),
                 Task(
@@ -124,6 +136,8 @@ def create_app():
                     min_age=14,
                     requirements='Паспорт РФ',
                     instructions='https://trk.ppdu.ru/click/BUb3cOmt',
+                    rating=round(random.uniform(4.3, 5.0), 1),
+                    completed_count=random.randint(50, 500),
                     is_active=True
                 ),
                 Task(
@@ -137,6 +151,8 @@ def create_app():
                     min_age=14,
                     requirements='Паспорт РФ',
                     instructions='https://trk.ppdu.ru/click/a40lVV2h',
+                    rating=round(random.uniform(4.1, 4.8), 1),
+                    completed_count=random.randint(50, 500),
                     is_active=True
                 ),
                 Task(
@@ -150,6 +166,8 @@ def create_app():
                     min_age=14,
                     requirements='Паспорт РФ',
                     instructions='https://trk.ppdu.ru/click/8C0qmXXH',
+                    rating=round(random.uniform(4.2, 4.9), 1),
+                    completed_count=random.randint(50, 500),
                     is_active=True
                 ),
                 Task(
@@ -163,6 +181,8 @@ def create_app():
                     min_age=14,
                     requirements='Паспорт РФ',
                     instructions='https://trk.ppdu.ru/click/wcIXwd1G',
+                    rating=round(random.uniform(3.9, 4.7), 1),
+                    completed_count=random.randint(50, 500),
                     is_active=True
                 ),
 
@@ -178,6 +198,8 @@ def create_app():
                     min_age=18,
                     requirements='Паспорт РФ, 18+',
                     instructions='https://trk.ppdu.ru/click/kE0noVk6',
+                    rating=round(random.uniform(4.2, 4.9), 1),
+                    completed_count=random.randint(50, 500),
                     is_active=True
                 ),
                 Task(
@@ -191,6 +213,8 @@ def create_app():
                     min_age=18,
                     requirements='Паспорт РФ',
                     instructions='https://trk.ppdu.ru/click/lprRzKZd',
+                    rating=round(random.uniform(4.3, 5.0), 1),
+                    completed_count=random.randint(50, 500),
                     is_active=True
                 ),
                 Task(
@@ -204,6 +228,8 @@ def create_app():
                     min_age=18,
                     requirements='Паспорт РФ',
                     instructions='https://trk.ppdu.ru/click/t5H6vwqu',
+                    rating=round(random.uniform(4.1, 4.8), 1),
+                    completed_count=random.randint(50, 500),
                     is_active=True
                 ),
 
@@ -219,6 +245,8 @@ def create_app():
                     min_age=18,
                     requirements='Для юрлиц и ИП',
                     instructions='https://trk.ppdu.ru/click/Z4BkvJPV',
+                    rating=round(random.uniform(4.0, 4.7), 1),
+                    completed_count=random.randint(50, 500),
                     is_active=True
                 ),
                 Task(
@@ -232,6 +260,8 @@ def create_app():
                     min_age=18,
                     requirements='Для ИП и ООО',
                     instructions='https://trk.ppdu.ru/click/OGDQBFwh',
+                    rating=round(random.uniform(4.4, 5.0), 1),
+                    completed_count=random.randint(50, 500),
                     is_active=True
                 ),
                 Task(
@@ -245,6 +275,8 @@ def create_app():
                     min_age=18,
                     requirements='Для новых клиентов',
                     instructions='https://trk.ppdu.ru/click/bN3VxKqP',
+                    rating=round(random.uniform(4.2, 4.9), 1),
+                    completed_count=random.randint(50, 500),
                     is_active=True
                 ),
                 Task(
@@ -258,6 +290,8 @@ def create_app():
                     min_age=18,
                     requirements='ЮЛ от 6 мес',
                     instructions='https://trk.ppdu.ru/click/uKpgCQsc',
+                    rating=round(random.uniform(4.0, 4.8), 1),
+                    completed_count=random.randint(50, 500),
                     is_active=True
                 ),
 
@@ -275,15 +309,13 @@ def create_app():
                     min_age=18,
                     requirements='18+, желание работать',
                     instructions='https://trk.ppdu.ru/click/pKYWYSuY',
+                    rating=round(random.uniform(4.5, 5.0), 1),
+                    completed_count=random.randint(50, 500),
                     is_active=True
                 ),
             ]
 
             for task in tasks:
-                # Генерируем случайный рейтинг для каждого задания
-                import random
-                task.rating = round(random.uniform(3.8, 5.0), 1)
-                task.completed_count = random.randint(50, 500)
                 db.session.add(task)
             db.session.commit()
             print(f"✅ Добавлено {len(tasks)} заданий с рейтингами")
