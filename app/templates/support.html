@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 
 {% block content %}
-
 <div class="max-w-7xl mx-auto px-4 py-8">
     <!-- Заголовок -->
     <div class="text-center mb-12">
@@ -45,8 +44,6 @@
                     <span class="text-xs text-gray-500 mt-1">Поддержка • сейчас</span>
                 </div>
             </div>
-
-            <!-- Динамические сообщения будут добавляться сюда -->
         </div>
 
         <!-- Форма отправки -->
@@ -77,6 +74,7 @@
 
     socket.on('new_message', function(data) {
         addMessage(data);
+        scrollToBottom();
     });
 
     function sendMessage() {
@@ -94,24 +92,25 @@
         const messageDiv = document.createElement('div');
         
         const isMyMessage = data.user_id === currentUserId;
+        const isFromAdmin = data.is_admin;
         
         messageDiv.className = `flex mb-4 ${isMyMessage ? 'justify-end' : 'justify-start'}`;
         
         messageDiv.innerHTML = `
-            <div class="max-w-xs">
+            <div class="max-w-xs lg:max-w-md">
                 <div class="flex items-center ${isMyMessage ? 'justify-end' : 'justify-start'} mb-1">
                     <span class="text-xs text-gray-500">${data.username}</span>
                     <span class="text-xs text-gray-500 mx-2">•</span>
                     <span class="text-xs text-gray-500">${data.time || 'сейчас'}</span>
                 </div>
-                <div class="rounded-2xl p-3 ${data.is_admin ? 'bg-gradient-to-r from-yellow-500 to-orange-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white'}">
+                <div class="rounded-2xl p-3 ${isFromAdmin ? 'bg-gradient-to-r from-yellow-500 to-orange-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white'}">
                     ${data.message}
                 </div>
             </div>
         `;
         
         messagesDiv.appendChild(messageDiv);
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        scrollToBottom();
     }
 
     document.getElementById('message-input').addEventListener('keypress', function(e) {
@@ -119,5 +118,10 @@
             sendMessage();
         }
     });
+
+    function scrollToBottom() {
+        const messagesDiv = document.getElementById('chat-messages');
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
 </script>
 {% endblock %}

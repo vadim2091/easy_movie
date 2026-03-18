@@ -1,79 +1,326 @@
-{% for task in tasks %}
-<div class="group bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 overflow-hidden border border-gray-100 dark:border-gray-700">
-    <div class="h-2 bg-gradient-to-r from-yellow-400 to-orange-500"></div>
-    
-    <div class="p-4 sm:p-6">
-        <div class="flex justify-between items-start mb-3">
-            <h3 class="text-lg sm:text-xl font-bold text-gray-800 dark:text-white group-hover:text-yellow-600 transition">
-                {{ task.title }}
-            </h3>
-            <span class="px-2 py-1 {% if task.min_age and task.min_age >= 18 %}bg-red-100 text-red-600{% else %}bg-green-100 text-green-600{% endif %} rounded-full text-xs font-bold">
-                {% if task.min_age %}{{ task.min_age }}+{% else %}0+{% endif %}
-            </span>
-        </div>
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="max-w-7xl mx-auto px-4 py-8">
+    <!-- Заголовок с поиском -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+        <h1 class="text-4xl font-bold bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text text-transparent mb-4 md:mb-0">
+            Задания 🍊
+        </h1>
         
-        <!-- Описание с разворотом -->
-        <div x-data="{ expanded: false }" class="mb-3 text-sm text-gray-600 dark:text-gray-400">
-            <p x-show="!expanded">{{ task.description|truncate(100, true, '...') }}</p>
-            <p x-show="expanded">{{ task.description }}</p>
-            {% if task.description|length > 100 %}
-            <button @click="expanded = !expanded" class="text-yellow-600 hover:text-yellow-700 text-xs font-medium mt-1">
-                <span x-show="!expanded">ещё...</span>
-                <span x-show="expanded">скрыть</span>
+        <!-- Поиск -->
+        <form method="GET" class="flex gap-2">
+            <input type="text" 
+                   name="search" 
+                   value="{{ current_search }}"
+                   placeholder="Поиск заданий..." 
+                   class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
+            <button type="submit" class="bg-yellow-500 text-white px-6 py-2 rounded-lg hover:bg-yellow-600">
+                <i class="fas fa-search"></i>
             </button>
-            {% endif %}
-        </div>
-        
-        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-            <span class="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-full text-xs text-gray-600 dark:text-gray-400">
-                {{ task.category.icon if task.category else '📦' }} {{ task.category.name if task.category else 'Задание' }}
-            </span>
-            
-            <!-- Рейтинг со звёздами -->
-            <div class="flex items-center space-x-1">
-                <div class="flex text-yellow-400 text-sm">
-                    {% set rating = task.rating|default(4.5)|float %}
-                    {% for i in range(1,6) %}
-                        {% if i <= rating %}
-                            <i class="fas fa-star"></i>
-                        {% elif i - 0.5 <= rating %}
-                            <i class="fas fa-star-half-alt"></i>
-                        {% else %}
-                            <i class="far fa-star"></i>
-                        {% endif %}
-                    {% endfor %}
-                </div>
-                <span class="text-xs text-gray-500">({{ task.completed_count|default(0) }})</span>
-            </div>
+        </form>
+    </div>
+
+    <!-- Фильтры -->
+    <div class="flex flex-wrap gap-4 mb-6">
+        <div class="flex items-center space-x-2 bg-white dark:bg-gray-800 rounded-lg p-1">
+            <a href="{{ url_for('tasks.tasks_list', min_age=14, category=current_category, sort=current_sort, search=current_search) }}" 
+               class="px-4 py-2 rounded-lg {% if current_min_age == 14 %}bg-yellow-500 text-white{% else %}hover:bg-gray-100 dark:hover:bg-gray-700{% endif %}">
+                14+
+            </a>
+            <a href="{{ url_for('tasks.tasks_list', min_age=18, category=current_category, sort=current_sort, search=current_search) }}" 
+               class="px-4 py-2 rounded-lg {% if current_min_age == 18 %}bg-yellow-500 text-white{% else %}hover:bg-gray-100 dark:hover:bg-gray-700{% endif %}">
+                18+
+            </a>
+            <a href="{{ url_for('tasks.tasks_list', category=current_category, sort=current_sort, search=current_search) }}" 
+               class="px-4 py-2 rounded-lg {% if not current_min_age %}bg-yellow-500 text-white{% else %}hover:bg-gray-100 dark:hover:bg-gray-700{% endif %}">
+                Все
+            </a>
         </div>
 
-        <!-- Предупреждение для карт -->
-        {% if task.category and task.category.slug in ['debit-cards', 'credit-cards'] %}
-        <div class="mb-3 p-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-            <p class="text-xs text-red-600 dark:text-red-400 flex items-center">
-                <i class="fas fa-exclamation-triangle mr-2"></i>
-                Невыполнение условий ведёт к блокировке вывода.
-            </p>
-        </div>
-        {% endif %}
+        <!-- Сортировка -->
+        <select name="sort" onchange="window.location.href=this.value" class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2">
+            <option value="{{ url_for('tasks.tasks_list', sort='newest', category=current_category, min_age=current_min_age, search=current_search) }}" 
+                    {% if current_sort == 'newest' %}selected{% endif %}>
+                🔄 Сначала новые
+            </option>
+            <option value="{{ url_for('tasks.tasks_list', sort='price_desc', category=current_category, min_age=current_min_age, search=current_search) }}"
+                    {% if current_sort == 'price_desc' %}selected{% endif %}>
+                💰 Сначала дорогие
+            </option>
+            <option value="{{ url_for('tasks.tasks_list', sort='price_asc', category=current_category, min_age=current_min_age, search=current_search) }}"
+                    {% if current_sort == 'price_asc' %}selected{% endif %}>
+                💸 Сначала дешевые
+            </option>
+        </select>
+    </div>
+
+    <!-- Категории -->
+    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3 mb-8">
+        <a href="{{ url_for('tasks.tasks_list', min_age=current_min_age, sort=current_sort, search=current_search) }}" 
+           class="bg-gradient-to-br from-yellow-400 to-orange-500 text-white p-4 rounded-xl text-center hover:scale-105 transition shadow-lg">
+            <span class="text-2xl block mb-1">📋</span>
+            <span class="font-medium text-sm">Все</span>
+        </a>
         
-        <div class="flex justify-between items-center">
-            <div class="text-xl sm:text-2xl font-bold text-yellow-600">
-                {{ task.reward }} <span class="text-sm sm:text-lg">🍊</span>
-            </div>
+        {% for category in categories %}
+        <a href="{{ url_for('tasks.tasks_list', category=category.slug, min_age=current_min_age, sort=current_sort, search=current_search) }}" 
+           class="bg-white dark:bg-gray-800 p-4 rounded-xl text-center hover:scale-105 transition shadow-md {% if current_category == category.slug %}ring-2 ring-yellow-500{% endif %}">
+            <span class="text-2xl block mb-1">{{ category.icon }}</span>
+            <span class="font-medium text-sm dark:text-white">{{ category.name }}</span>
+        </a>
+        {% endfor %}
+    </div>
+
+    <!-- Сетка заданий -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for task in tasks %}
+        <div class="group bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 overflow-hidden border border-gray-100 dark:border-gray-700">
+            <div class="h-2 bg-gradient-to-r from-yellow-400 to-orange-500"></div>
             
-            {% if current_user.is_authenticated %}
-            <a href="{{ task.instructions }}" target="_blank" rel="noopener noreferrer"
-               class="bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-4 py-2 rounded-xl text-sm sm:text-base font-medium hover:from-yellow-600 hover:to-orange-600 transition shadow-md hover:shadow-lg transform hover:scale-105">
-                Начать
-            </a>
-            {% else %}
-            <a href="{{ url_for('auth.login') }}" 
-               class="bg-gray-400 text-white px-4 py-2 rounded-xl text-sm sm:text-base font-medium hover:bg-gray-500 transition shadow-md">
-                Войти
-            </a>
-            {% endif %}
+            <div class="p-6">
+                <div class="flex justify-between items-start mb-3">
+                    <h3 class="text-xl font-bold text-gray-800 dark:text-white group-hover:text-yellow-600 transition">
+                        {{ task.title }}
+                    </h3>
+                    <span class="px-3 py-1 {% if task.min_age and task.min_age >= 18 %}bg-red-100 text-red-600{% else %}bg-green-100 text-green-600{% endif %} rounded-full text-xs font-bold">
+                        {% if task.min_age %}{{ task.min_age }}+{% else %}0+{% endif %}
+                    </span>
+                </div>
+                
+                <!-- ОПИСАНИЕ С ВОЗМОЖНОСТЬЮ РАЗВОРОТА -->
+                <div x-data="{ expanded: false }" class="mb-4">
+                    <p class="text-gray-600 dark:text-gray-400 text-sm">
+                        <span x-show="!expanded">{{ task.description|truncate(150, True, '...') }}</span>
+                        <span x-show="expanded">{{ task.description }}</span>
+                    </p>
+                    {% if task.description|length > 150 %}
+                    <button @click="expanded = !expanded" class="text-yellow-600 hover:text-yellow-700 text-sm font-medium mt-1 focus:outline-none">
+                        <span x-show="!expanded">ещё...</span>
+                        <span x-show="expanded">скрыть</span>
+                    </button>
+                    {% endif %}
+                </div>
+                
+                <div class="flex items-center justify-between mb-4">
+                    <span class="px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded-full text-xs text-gray-600 dark:text-gray-400">
+                        {{ task.category.icon if task.category else '📋' }} {{ task.category.name if task.category else 'Задание' }}
+                    </span>
+                </div>
+
+                <!-- КРАСНАЯ ПЛАШКА ТОЛЬКО ДЛЯ КАРТ -->
+                {% if task.category and task.category.slug in ['debit-cards', 'credit-cards'] %}
+                <div class="mb-4 p-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                    <p class="text-xs text-red-600 dark:text-red-400 flex items-center">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                        Если вы не выполните условия, вывод будет заблокирован.
+                    </p>
+                </div>
+                {% endif %}
+                
+                <div class="flex justify-between items-center">
+                    <div class="text-2xl font-bold text-yellow-600">
+                        {{ task.reward }} <span class="text-lg">🍊</span>
+                    </div>
+                    
+                    {% if current_user.is_authenticated %}
+                    <a href="{{ task.instructions }}" target="_blank" rel="noopener noreferrer"
+                       class="bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-6 py-2 rounded-xl font-medium hover:from-yellow-600 hover:to-orange-600 transition shadow-md hover:shadow-lg transform hover:scale-105 inline-block">
+                        Начать
+                    </a>
+                    {% else %}
+                    <a href="{{ url_for('auth.login') }}" 
+                       class="bg-gray-400 text-white px-6 py-2 rounded-xl font-medium hover:bg-gray-500 transition shadow-md inline-block">
+                        Войти
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Если заданий нет -->
+    {% if not tasks %}
+    <div class="text-center py-12">
+        <div class="text-6xl mb-4">😕</div>
+        <h3 class="text-2xl font-bold text-gray-700 dark:text-gray-300 mb-2">Заданий пока нет</h3>
+        <p class="text-gray-500">Загляни позже, они обязательно появятся!</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- ===== ФЕЙКОВЫЕ ОТЗЫВЫ ===== -->
+<div class="max-w-7xl mx-auto px-4 py-12 border-t border-gray-200 dark:border-gray-700">
+    <h2 class="text-3xl font-bold text-center mb-8">Отзывы наших пользователей</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Отзыв 1 -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
+            <div class="flex items-center mb-4">
+                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-white font-bold text-xl mr-4">
+                    А
+                </div>
+                <div>
+                    <h4 class="font-semibold">Анна С.</h4>
+                    <div class="flex text-yellow-400">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                </div>
+            </div>
+            <p class="text-gray-600 dark:text-gray-400 text-sm">"Очень удобный сервис! Задания простые, мандарины копятся быстро. Уже вывел 1500₽ на карту. Всем советую!"</p>
+            <p class="text-xs text-gray-500 mt-3">12 марта 2026</p>
+        </div>
+        <!-- Отзыв 2 -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
+            <div class="flex items-center mb-4">
+                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-bold text-xl mr-4">
+                    Д
+                </div>
+                <div>
+                    <h4 class="font-semibold">Дмитрий К.</h4>
+                    <div class="flex text-yellow-400">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
+                    </div>
+                </div>
+            </div>
+            <p class="text-gray-600 dark:text-gray-400 text-sm">"Оформлял карту по заданию – получил 2200 мандаринов. Всё честно, поддержка отвечает быстро. Минус – иногда долго проверяют."</p>
+            <p class="text-xs text-gray-500 mt-3">8 марта 2026</p>
+        </div>
+        <!-- Отзыв 3 -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
+            <div class="flex items-center mb-4">
+                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white font-bold text-xl mr-4">
+                    Е
+                </div>
+                <div>
+                    <h4 class="font-semibold">Елена В.</h4>
+                    <div class="flex text-yellow-400">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                </div>
+            </div>
+            <p class="text-gray-600 dark:text-gray-400 text-sm">"Лучший сайт для дополнительного заработка! Уже пригласила двоих друзей – получила бонусы. Мандарины реально выводятся."</p>
+            <p class="text-xs text-gray-500 mt-3">2 марта 2026</p>
         </div>
     </div>
 </div>
-{% endfor %}
+
+<!-- Модальное окно задания (закомментировано) -->
+<!-- <div x-data="{ 
+        showModal: false, 
+        task: {},
+        init() {
+            console.log('🔧 Модалка инициализирована. showModal =', this.showModal);
+            this.$watch('showModal', value => console.log('👁️ showModal изменился на', value));
+        }
+     }" 
+     @open-task-modal.window="
+        console.log('📢 ПОЛУЧЕНО СОБЫТИЕ open-task-modal', $event.detail);
+        if($event.detail && $event.detail.id) { 
+            showModal = true; 
+            task = $event.detail; 
+            console.log('✅ Модалка открыта для задания ID', task.id);
+        } else {
+            console.warn('⚠️ СОБЫТИЕ БЕЗ ID ИГНОРИРУЕМ', $event.detail);
+        }"
+     class="fixed inset-0 overflow-y-auto z-50" 
+     x-show="showModal"
+     x-cloak
+     x-transition:enter="transition ease-out duration-300"
+     x-transition:enter-start="opacity-0 scale-90"
+     x-transition:enter-end="opacity-100 scale-100"
+     x-transition:leave="transition ease-in duration-200"
+     x-transition:leave-start="opacity-100 scale-100"
+     x-transition:leave-end="opacity-0 scale-90">
+    <div class="flex items-center justify-center min-h-screen px-4">
+        <div class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm" @click="showModal = false"></div>
+        
+        <div class="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-2xl transform transition-all max-w-lg w-full relative z-50">
+            <div class="h-2 bg-gradient-to-r from-yellow-400 to-orange-500"></div>
+            
+            <div class="px-6 py-6">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white" x-text="task.title || 'Загрузка...'"></h3>
+                    <button @click="showModal = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="space-y-4">
+                    <p class="text-gray-600 dark:text-gray-400" x-text="task.description || ''"></p>
+                    
+                    <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-4">
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                            <span class="font-bold text-gray-900 dark:text-white">🎯 Награда:</span> 
+                            <span class="text-yellow-600 font-bold" x-text="task.reward"></span> 🍊
+                        </p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                            <span class="font-bold text-gray-900 dark:text-white">📋 Требования:</span> 
+                            <span x-text="task.requirements || 'Нет особых требований'"></span>
+                        </p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                            <span class="font-bold text-gray-900 dark:text-white">🔞 Возраст:</span> 
+                            <span x-text="task.min_age ? task.min_age + '+' : 'без ограничений'"></span>
+                        </p>
+                    </div>
+                    
+                    <div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4">
+                        <p class="text-sm text-blue-800 dark:text-blue-300 font-medium mb-2">📝 Инструкция:</p>
+                        <p class="text-sm text-blue-700 dark:text-blue-400" x-text="task.instructions || 'Следуйте инструкции на сайте партнера'"></p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700 flex justify-end space-x-3">
+                <button @click="showModal = false" 
+                        class="px-6 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-xl transition">
+                    Закрыть
+                </button>
+                
+                {% if current_user.is_authenticated %}
+                <button @click="acceptTask(task.id)" 
+                        class="px-6 py-2 text-sm font-medium text-white bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 rounded-xl transition shadow-md">
+                    Взять задание
+                </button>
+                {% else %}
+                <a href="{{ url_for('auth.login') }}" 
+                   class="px-6 py-2 text-sm font-medium text-white bg-gray-500 hover:bg-gray-600 rounded-xl transition">
+                    Войдите чтобы взять
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div> -->
+
+<script>
+function openTaskModal(taskId) {
+    if (!taskId) return;
+    fetch(`/tasks/${taskId}`)
+        .then(response => response.json())
+        .then(task => {
+            if (task && task.id) {
+                window.dispatchEvent(new CustomEvent('open-task-modal', { detail: task }));
+            }
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+function acceptTask(taskId) {
+    fetch(`/tasks/${taskId}/accept`, { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('✅ Задание взято! Проверьте статус в профиле.');
+                document.querySelector('[x-data]').__x.$data.showModal = false;
+            } else {
+                alert('❌ Ошибка: ' + data.error);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+}
+</script>
+{% endblock %}
