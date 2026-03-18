@@ -84,12 +84,10 @@ def handle_message(data):
     
     emit('new_message', response, broadcast=True)
     
-    # Отправляем уведомление в Telegram, если сообщение от обычного пользователя (не админа)
+    # Отправляем уведомление в Telegram, если сообщение от обычного пользователя
     if not current_user.is_admin:
         try:
-            # Импорт внутри функции, чтобы избежать циклического импорта
             from app.telegram_utils import notify_admin
-            # Запускаем в отдельном потоке, чтобы не блокировать вебсокет
             thread = threading.Thread(
                 target=notify_admin,
                 args=(current_user.username, current_user.id, message),

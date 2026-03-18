@@ -14,13 +14,11 @@ def create_app():
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static', 'uploads')
 
-    # === 1. Инициализация расширений ===
     db.init_app(app)
     login_manager.init_app(app)
     login_manager.login_view = 'auth.login'
     socketio.init_app(app, cors_allowed_origins="*")
 
-    # === 2. Регистрация blueprint'ов (они не должны импортировать модели до инициализации) ===
     from app.routes.auth import auth_bp
     from app.routes.tasks import tasks_bp
     from app.routes.profile import profile_bp
@@ -33,7 +31,6 @@ def create_app():
     app.register_blueprint(main_bp)
     app.register_blueprint(support_bp)
 
-    # === 3. Админка ===
     try:
         from app.admin import init_admin
         init_admin(app)
@@ -41,18 +38,15 @@ def create_app():
     except Exception as e:
         print(f"❌ Ошибка админки: {e}")
 
-    # === 4. Создание таблиц и наполнение данными – ВСЁ ВНУТРИ КОНТЕКСТА ===
     with app.app_context():
-        # Сначала создаём таблицы (если их нет)
         db.create_all()
         print("✅ Таблицы созданы (если не существовали)")
 
-        # Импортируем модели ТОЛЬКО ЗДЕСЬ, внутри контекста
         from app.models import User, Category, Task
         from werkzeug.security import generate_password_hash
         import random
 
-        # === СОЗДАЁМ АДМИНА ЕСЛИ НЕТ ===
+        # Админ
         admin = User.query.filter_by(email='admin@yandex.ru').first()
         if not admin:
             admin = User(
@@ -66,21 +60,21 @@ def create_app():
             db.session.commit()
             print("✅ Админ создан: admin@yandex.ru / dimala209")
 
-        # Категории
+        # Категории с современными эмодзи
         if Category.query.count() == 0:
             categories = [
-                Category(name='💳 Дебетовые', slug='debit-cards', icon='💎', min_age=14, sort_order=1),
-                Category(name='🏦 Кредитные', slug='credit-cards', icon='💳', min_age=18, sort_order=2),
-                Category(name='📊 РКО', slug='business-accounts', icon='📈', min_age=18, sort_order=3),
-                Category(name='👤 ИП', slug='ip-registration', icon='👔', min_age=18, sort_order=4),
-                Category(name='🚚 Вакансии', slug='vacancy', icon='📦', min_age=18, sort_order=5),
+                Category(name='💎 Дебетовые', slug='debit-cards', icon='💎', min_age=14, sort_order=1),
+                Category(name='💳 Кредитные', slug='credit-cards', icon='💳', min_age=18, sort_order=2),
+                Category(name='📊 РКО', slug='business-accounts', icon='📊', min_age=18, sort_order=3),
+                Category(name='👔 ИП', slug='ip-registration', icon='👔', min_age=18, sort_order=4),
+                Category(name='📦 Вакансии', slug='vacancy', icon='📦', min_age=18, sort_order=5),
             ]
             for cat in categories:
                 db.session.add(cat)
             db.session.commit()
             print("✅ Категории созданы")
 
-        # Задания (если их нет)
+        # Задания (14 штук) с рейтингами
         if Task.query.count() == 0:
             debit = Category.query.filter_by(slug='debit-cards').first()
             credit = Category.query.filter_by(slug='credit-cards').first()
@@ -88,13 +82,10 @@ def create_app():
             vacancy = Category.query.filter_by(slug='vacancy').first()
 
             tasks = [
-                # ===== ДЕБЕТОВЫЕ КАРТЫ =====
+                # Дебетовые
                 Task(
                     title='💎 Т-Банк Black',
-                    description='''**🔥 Топ-карта с кэшбэком до 30%**
-• Бесплатное обслуживание от 50к баланса
-• 4 категории с кэшбэком 15%
-• Снятие до 500к без комиссии''',
+                    description='**🔥 Топ-карта с кэшбэком до 30%**\n• Бесплатное обслуживание от 50к баланса\n• 4 категории с кэшбэком 15%\n• Снятие до 500к без комиссии',
                     reward=2100,
                     category_id=debit.id,
                     min_age=14,
@@ -106,10 +97,7 @@ def create_app():
                 ),
                 Task(
                     title='👑 Т-Банк Молодёжная',
-                    description='''**🚀 Для молодых и активных**
-• Кэшбэк до 30%
-• Бесплатное обслуживание
-• 4 любимые категории''',
+                    description='**🚀 Для молодых и активных**\n• Кэшбэк до 30%\n• Бесплатное обслуживание\n• 4 любимые категории',
                     reward=2200,
                     category_id=debit.id,
                     min_age=14,
@@ -121,10 +109,7 @@ def create_app():
                 ),
                 Task(
                     title='🕌 Исламская карта',
-                    description='''**☪ Соответствует нормам шариата**
-• Кожаный картхолдер в подарок
-• Без комиссии за переводы
-• До 30 млн ₽ переводов''',
+                    description='**☪ Соответствует нормам шариата**\n• Кожаный картхолдер в подарок\n• Без комиссии за переводы\n• До 30 млн ₽ переводов',
                     reward=1100,
                     category_id=debit.id,
                     min_age=14,
@@ -136,10 +121,7 @@ def create_app():
                 ),
                 Task(
                     title='📱 МТС Деньги',
-                    description='''**🎯 Кэшбэк до 30% за связь**
-• 5 категорий на выбор
-• До 30% за оплату МТС
-• 10% на маркетплейсы''',
+                    description='**🎯 Кэшбэк до 30% за связь**\n• 5 категорий на выбор\n• До 30% за оплату МТС\n• 10% на маркетплейсы',
                     reward=2300,
                     category_id=debit.id,
                     min_age=14,
@@ -151,10 +133,7 @@ def create_app():
                 ),
                 Task(
                     title='🏆 БСПБ Platinum',
-                    description='''**💎 Mir Platinum Cash Back**
-• 7% в ресторанах
-• 5% на АЗС
-• Страхование в путешествиях''',
+                    description='**💎 Mir Platinum Cash Back**\n• 7% в ресторанах\n• 5% на АЗС\n• Страхование в путешествиях',
                     reward=1920,
                     category_id=debit.id,
                     min_age=14,
@@ -166,10 +145,7 @@ def create_app():
                 ),
                 Task(
                     title='⭐ Альфа-Смарт',
-                    description='''**✨ Привилегии за подписку**
-• Кэшбэк до 100%
-• 2% на остаток
-• Бесплатное обслуживание''',
+                    description='**✨ Привилегии за подписку**\n• Кэшбэк до 100%\n• 2% на остаток\n• Бесплатное обслуживание',
                     reward=1200,
                     category_id=debit.id,
                     min_age=14,
@@ -180,13 +156,10 @@ def create_app():
                     is_active=True
                 ),
 
-                # ===== КРЕДИТНЫЕ КАРТЫ =====
+                # Кредитные
                 Task(
                     title='🏦 ВТБ Кредитная',
-                    description='''**💰 До 1 млн ₽**
-• Льготный период до 200 дней
-• Снятие без комиссии 30 дней
-• Бесплатная доставка''',
+                    description='**💰 До 1 млн ₽**\n• Льготный период до 200 дней\n• Снятие без комиссии 30 дней\n• Бесплатная доставка',
                     reward=1200,
                     category_id=credit.id,
                     min_age=18,
@@ -198,10 +171,7 @@ def create_app():
                 ),
                 Task(
                     title='💳 Т-Банк Платинум',
-                    description='''**👑 Премиальная карта**
-• До 1 млн ₽
-• Рассрочка до 12 месяцев
-• Бесплатные переводы''',
+                    description='**👑 Премиальная карта**\n• До 1 млн ₽\n• Рассрочка до 12 месяцев\n• Бесплатные переводы',
                     reward=2100,
                     category_id=credit.id,
                     min_age=18,
@@ -213,10 +183,7 @@ def create_app():
                 ),
                 Task(
                     title='⏳ Уралсиб 120 дней',
-                    description='''**📅 Без процентов 120 дней**
-• Лимит до 1 млн
-• Бесплатное обслуживание
-• Кэшбэк до 30%''',
+                    description='**📅 Без процентов 120 дней**\n• Лимит до 1 млн\n• Бесплатное обслуживание\n• Кэшбэк до 30%',
                     reward=2900,
                     category_id=credit.id,
                     min_age=18,
@@ -227,13 +194,10 @@ def create_app():
                     is_active=True
                 ),
 
-                # ===== РКО =====
+                # РКО
                 Task(
                     title='🏢 ВТБ Бизнес',
-                    description='''**📊 Регистрация + РКО**
-• Открытие за 1 день
-• Фиксированная ставка
-• 50 отделений в РФ''',
+                    description='**📊 Регистрация + РКО**\n• Открытие за 1 день\n• Фиксированная ставка\n• 50 отделений в РФ',
                     reward=7200,
                     category_id=business.id,
                     min_age=18,
@@ -245,10 +209,7 @@ def create_app():
                 ),
                 Task(
                     title='🎯 Точка Банк',
-                    description='''**⚡ РКО за 0 ₽**
-• Скидка 80% первые 3 мес
-• До 7% на остаток
-• Круглосуточная поддержка''',
+                    description='**⚡ РКО за 0 ₽**\n• Скидка 80% первые 3 мес\n• До 7% на остаток\n• Круглосуточная поддержка',
                     reward=5200,
                     category_id=business.id,
                     min_age=18,
@@ -260,10 +221,7 @@ def create_app():
                 ),
                 Task(
                     title='🏛 Уралсиб РКО',
-                    description='''**📈 Пакет «Удобный»**
-• 0 ₽ за месяц
-• 10 платежей бесплатно
-• Бесплатная бизнес-карта''',
+                    description='**📈 Пакет «Удобный»**\n• 0 ₽ за месяц\n• 10 платежей бесплатно\n• Бесплатная бизнес-карта',
                     reward=5200,
                     category_id=business.id,
                     min_age=18,
@@ -275,10 +233,7 @@ def create_app():
                 ),
                 Task(
                     title='🏦 Норвик Банк',
-                    description='''**💼 РКО для бизнеса**
-• Корпоративная карта бесплатно
-• Кешбэк до 5%
-• Открытие за 1 день''',
+                    description='**💼 РКО для бизнеса**\n• Корпоративная карта бесплатно\n• Кешбэк до 5%\n• Открытие за 1 день',
                     reward=6200,
                     category_id=business.id,
                     min_age=18,
@@ -289,15 +244,10 @@ def create_app():
                     is_active=True
                 ),
 
-                # ===== ВАКАНСИИ =====
+                # Вакансия
                 Task(
                     title='🚚 Яндекс Еда',
-                    description='''**⚡ Заработок до 3500 ₽/день**
-• Гибкий график
-• Заказы 24/7
-• Бонусы за первые заказы
-
-🔥 **20 000 мандаринов** за 5 заказов!''',
+                    description='**⚡ Заработок до 3500 ₽/день**\n• Гибкий график\n• Заказы 24/7\n• Бонусы за первые заказы\n\n🔥 **20 000 мандаринов** за 5 заказов!',
                     reward=20000,
                     category_id=vacancy.id,
                     min_age=18,
@@ -314,7 +264,7 @@ def create_app():
             db.session.commit()
             print(f"✅ Добавлено {len(tasks)} заданий с рейтингами")
 
-        # === Загрузчик пользователя (должен быть после инициализации db, но внутри контекста) ===
+        # Загрузчик пользователя
         @login_manager.user_loader
         def load_user(user_id):
             return User.query.get(int(user_id))

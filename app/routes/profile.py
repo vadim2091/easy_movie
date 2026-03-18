@@ -2,20 +2,13 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request,
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 from app import db
-from app.models import User, UserTask, Transaction
+from app.models import User, UserTask, Transaction, Withdrawal
 from app.forms import ProfileForm
 from datetime import datetime
 import os
 import secrets
 
-# Создаем blueprint (ДОЛЖЕН БЫТЬ ПЕРВЫМ!)
 profile_bp = Blueprint('profile', __name__)
-
-# Разрешенные расширения для аватаров
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
-
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @profile_bp.route('/profile', methods=['GET', 'POST'])
 @login_required
@@ -44,6 +37,12 @@ def profile():
         .limit(10)\
         .all()
     
+    # Заявки на вывод
+    withdrawals = Withdrawal.query.filter_by(user_id=current_user.id)\
+        .order_by(Withdrawal.created_at.desc())\
+        .limit(5)\
+        .all()
+    
     stats = {
         'tasks_done': tasks_done,
         'total_earned': total_earned,
@@ -55,12 +54,12 @@ def profile():
                          form=form, 
                          user_tasks=user_tasks,
                          transactions=transactions,
+                         withdrawals=withdrawals,
                          stats=stats)
 
 @profile_bp.route('/upload-avatar', methods=['POST'])
 @login_required
 def upload_avatar():
-    """Загрузка аватарки"""
     if 'avatar' not in request.files:
         return {'success': False, 'error': 'Нет файла'}
     
@@ -68,48 +67,50 @@ def upload_avatar():
     if file.filename == '':
         return {'success': False, 'error': 'Файл не выбран'}
     
-    if file and allowed_file(file.filename):
-        # Создаем уникальное имя файла
+    if file:
         filename = secure_filename(file.filename)
         ext = filename.split('.')[-1]
         new_filename = f"avatar_{current_user.id}_{secrets.token_hex(8)}.{ext}"
         
-        # Путь для сохранения
         upload_folder = os.path.join(current_app.root_path, 'static', 'uploads')
         os.makedirs(upload_folder, exist_ok=True)
-        
-        # Сохраняем файл
         file.save(os.path.join(upload_folder, new_filename))
         
-        # Удаляем старый аватар если не default
-        if current_user.avatar and current_user.avatar != 'default.jpg':
+        if current_user.avatar != 'default.jpg':
             try:
                 old_file = os.path.join(upload_folder, current_user.avatar)
                 if os.path.exists(old_file):
                     os.remove(old_file)
-            except Exception as e:
-                print(f"Ошибка удаления старого аватара: {e}")
+            except:
+                pass
         
-        # Обновляем запись в БД
         current_user.avatar = new_filename
         db.session.commit()
-        
         return {'success': True, 'avatar': new_filename}
     
-    return {'success': False, 'error': 'Недопустимый формат файла. Разрешены: png, jpg, jpeg, gif'}
+    return {'success': False, 'error': 'Ошибка загрузки'}
 
-@profile_bp.route('/delete-avatar', methods=['POST'])
+@profile_bp.route('/withdraw', methods=['POST'])
 @login_required
-def delete_avatar():
-    """Удаление аватарки"""
-    if current_user.avatar and current_user.avatar != 'default.jpg':
-        upload_folder = os.path.join(current_app.root_path, 'static', 'uploads')
-        try:
-            os.remove(os.path.join(upload_folder, current_user.avatar))
-        except:
-            pass
+def withdraw():
+    amount = request.form.get('amount', type=int)
+    if not amount or amount < 500:
+        flash('Минимальная сумма вывода 500 мандаринов.', 'danger')
+        return redirect(url_for('profile.profile'))
+    if current_user.balance < amount:
+        flash('Недостаточно средств.', 'danger')
+        return redirect(url_for('profile.profile'))
     
-    current_user.avatar = 'default.jpg'
+    withdrawal = Withdrawal(
+        user_id=current_user.id,
+        amount=amount,
+        status='pending'
+    )
+    db.session.add(withdrawal)
+    # Замораживаем сумму
+    current_user.balance -= amount
+    current_user.hold_balance += amount
     db.session.commit()
     
-    return {'success': True}
+    flash('Заявка на вывод создана. Ожидайте подтверждения.', 'success')
+    return redirect(url_for('profile.profile'))

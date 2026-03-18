@@ -1,7 +1,7 @@
 from flask_login import UserMixin
 from datetime import datetime
 import secrets
-from app import db  # ← ЕДИНСТВЕННЫЙ ИСТОЧНИК db
+from app import db
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
