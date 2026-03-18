@@ -84,12 +84,13 @@ def handle_message(data):
     
     emit('new_message', response, broadcast=True)
     
-    # Отправляем уведомление в Telegram, если сообщение от обычного пользователя
+       # Отправляем уведомление в Telegram через бота
     if not current_user.is_admin:
         try:
-            from app.telegram_utils import notify_admin
+            from app.telegram_bot import send_notification
+            import threading
             thread = threading.Thread(
-                target=notify_admin,
+                target=send_notification,
                 args=(current_user.username, current_user.id, message),
                 daemon=True
             )
@@ -97,6 +98,7 @@ def handle_message(data):
             print(f"📱 Уведомление отправлено в Telegram: {message[:30]}...")
         except Exception as e:
             print(f"❌ Ошибка отправки в Telegram: {e}")
+            
 
 @socketio.on('typing')
 def handle_typing(data):
