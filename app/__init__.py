@@ -20,13 +20,7 @@ def create_app():
     login_manager.login_view = 'auth.login'
     socketio.init_app(app, cors_allowed_origins="*")
 
-    # === 2. Загрузчик пользователя (должен быть после инициализации db) ===
-    from app.models import User
-    @login_manager.user_loader
-    def load_user(user_id):
-        return User.query.get(int(user_id))
-
-    # === 3. Регистрация blueprint'ов ===
+    # === 2. Регистрация blueprint'ов (они не должны импортировать модели до инициализации) ===
     from app.routes.auth import auth_bp
     from app.routes.tasks import tasks_bp
     from app.routes.profile import profile_bp
@@ -39,7 +33,7 @@ def create_app():
     app.register_blueprint(main_bp)
     app.register_blueprint(support_bp)
 
-    # === 4. Админка ===
+    # === 3. Админка ===
     try:
         from app.admin import init_admin
         init_admin(app)
@@ -47,14 +41,14 @@ def create_app():
     except Exception as e:
         print(f"❌ Ошибка админки: {e}")
 
-    # === 5. Создание таблиц и наполнение данными (в контексте приложения) ===
+    # === 4. Создание таблиц и наполнение данными – ВСЁ ВНУТРИ КОНТЕКСТА ===
     with app.app_context():
-        # Сначала создаём таблицы
+        # Сначала создаём таблицы (если их нет)
         db.create_all()
         print("✅ Таблицы созданы (если не существовали)")
 
-        # Теперь импортируем модели внутри контекста
-        from app.models import Category, Task, User
+        # Импортируем модели ТОЛЬКО ЗДЕСЬ, внутри контекста
+        from app.models import User, Category, Task
         from werkzeug.security import generate_password_hash
         import random
 
@@ -319,5 +313,10 @@ def create_app():
                 db.session.add(task)
             db.session.commit()
             print(f"✅ Добавлено {len(tasks)} заданий с рейтингами")
+
+        # === Загрузчик пользователя (должен быть после инициализации db, но внутри контекста) ===
+        @login_manager.user_loader
+        def load_user(user_id):
+            return User.query.get(int(user_id))
 
     return app
