@@ -347,12 +347,25 @@
 .flex.items-center.space-x-3 > button {
     width: 50px !important;                  /* Фиксированная ширина кнопки */
 }
-        /* Десктоп (1025px+) */
-        @media (min-width: 1025px) {
-            .container, .max-w-7xl {
-                max-width: 1280px;
-            }
-        }
+       /* Мобильная адаптация */
+@media (max-width: 640px) {
+    .grid {
+        gap: 1rem;
+    }
+    
+    .card {
+        padding: 1rem;
+    }
+    
+    h1 {
+        font-size: 2rem;
+    }
+    
+    .btn, .btn-primary, .btn-secondary {
+        width: 100%;
+        text-align: center;
+    }
+}
     </style>
 </head>
 <body>
@@ -475,10 +488,10 @@
                 </div>
                 <div>
                     <h4 class="font-semibold mb-4">Поддержка</h4>
-                    <ul class="space-y-2 text-sm">
+                   <ul class="space-y-2 text-sm">
                         <li><a href="/support" class="text-[var(--text-secondary)] hover:text-yellow-600">Чат поддержки</a></li>
-                        <li><a href="#" class="text-[var(--text-secondary)] hover:text-yellow-600">FAQ</a></li>
-                        <li><a href="#" class="text-[var(--text-secondary)] hover:text-yellow-600">Правила</a></li>
+                        <li><a href="/faq" class="text-[var(--text-secondary)] hover:text-yellow-600">FAQ</a></li>
+                        <li><a href="/rules" class="text-[var(--text-secondary)] hover:text-yellow-600">Правила</a></li>
                     </ul>
                 </div>
                 <div>

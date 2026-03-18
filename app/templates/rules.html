@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-12">
+    <h1 class="text-4xl font-bold mb-8 text-center bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text text-transparent">
+        Правила сайта
+    </h1>
+    
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 space-y-6">
+        <div>
+            <h2 class="text-2xl font-bold mb-4">1. Общие положения</h2>
+            <p class="text-gray-600 dark:text-gray-400">Регистрируясь на сайте, вы соглашаетесь с настоящими правилами. Администрация оставляет за собой право изменять правила без уведомления пользователей.</p>
+        </div>
+        
+        <div>
+            <h2 class="text-2xl font-bold mb-4">2. Выполнение заданий</h2>
+            <ul class="list-disc list-inside space-y-2 text-gray-600 dark:text-gray-400">
+                <li>Задание считается выполненным после подтверждения администратором</li>
+                <li>Запрещено использовать чужие данные для выполнения заданий</li>
+                <li>Одно задание можно выполнить только один раз</li>
+                <li>Попытка обмана системы ведёт к блокировке аккаунта без возврата средств</li>
+            </ul>
+        </div>
+        
+        <div>
+            <h2 class="text-2xl font-bold mb-4">3. Вывод средств</h2>
+            <ul class="list-disc list-inside space-y-2 text-gray-600 dark:text-gray-400">
+                <li>Минимальная сумма вывода — 500 мандаринов</li>
+                <li>Вывод возможен только на карты, выпущенные в РФ</li>
+                <li>Срок обработки заявки — до 3 рабочих дней</li>
+                <li>В случае нарушения правил вывод может быть заблокирован</li>
+            </ul>
+        </div>
+        
+        <div>
+            <h2 class="text-2xl font-bold mb-4">4. Ответственность</h2>
+            <p class="text-gray-600 dark:text-gray-400">Администрация не несёт ответственности за действия партнёров, чьи задания размещены на сайте. Все претензии по качеству услуг решаются через поддержку.</p>
+        </div>
+        
+        <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-6 mt-6">
+            <h3 class="text-xl font-bold text-red-600 dark:text-red-400 mb-2">⚠️ Блокировка вывода</h3>
+            <p class="text-red-600 dark:text-red-400">Вывод средств может быть заблокирован в следующих случаях:</p>
+            <ul class="list-disc list-inside mt-2 text-red-600 dark:text-red-400">
+                <li>Использование нескольких аккаунтов одним лицом</li>
+                <li>Невыполнение условий задания</li>
+                <li>Попытка мошенничества</li>
+                <li>Нарушение правил партнёров</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

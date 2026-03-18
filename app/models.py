@@ -32,7 +32,7 @@ class User(UserMixin, db.Model):
 
     # Отношения
     referrals = db.relationship('User', backref=db.backref('referrer', remote_side=[id]))
-    
+
 class SupportMessage(db.Model):
     __tablename__ = 'support_messages'
     __table_args__ = {'extend_existing': True}
@@ -72,6 +72,29 @@ class Task(db.Model):
     # Связь с выполненными заданиями
     user_tasks = db.relationship('UserTask', backref='task_ref', lazy='dynamic')
 
+class Task(db.Model):
+    # ... существующие поля ...
+    
+    # Новые поля
+    rating = db.Column(db.Float, default=0.0)
+    completed_count = db.Column(db.Integer, default=0)
+
+class Withdrawal(db.Model):
+    __tablename__ = 'withdrawals'
+    __table_args__ = {'extend_existing': True}
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    amount = db.Column(db.Integer, nullable=False)
+    task_id = db.Column(db.Integer, db.ForeignKey('tasks.id'), nullable=True)
+    status = db.Column(db.String(20), default='pending')  # pending, approved, rejected
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    approved_at = db.Column(db.DateTime, nullable=True)
+    
+    user = db.relationship('User', backref='withdrawals')
+    task = db.relationship('Task', backref='withdrawals')
+
+    
 def update_rating(self):
     """Обновляет рейтинг задания на основе отзывов"""
     reviews = self.reviews.all()

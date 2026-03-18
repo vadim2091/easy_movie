@@ -188,7 +188,33 @@ class TransactionAdmin(AdminSecureView):
         }.get(m.type, m.type),
         'created_at': lambda v, c, m, p: m.created_at.strftime('%d.%m.%Y %H:%M') if m.created_at else '-'
     }
-
+class WithdrawalAdmin(AdminSecureView):
+    column_list = ['id', 'user', 'amount', 'task', 'status', 'created_at']
+    column_searchable_list = ['user.username']
+    column_filters = ['status']
+    column_editable_list = ['status']
+    
+    column_formatters = {
+        'user': lambda v, c, m, p: m.user.username if m.user else '-',
+        'task': lambda v, c, m, p: m.task.title if m.task else 'Вывод',
+        'status': lambda v, c, m, p: {
+            'pending': '⏳ Ожидает',
+            'approved': '✅ Одобрено',
+            'rejected': '❌ Отказ'
+        }.get(m.status, m.status)
+    }
+    
+    # Действие для одобрения вывода
+    def approve_withdrawal(self, ids):
+        for id in ids:
+            withdrawal = Withdrawal.query.get(id)
+            if withdrawal and withdrawal.status == 'pending':
+                withdrawal.status = 'approved'
+                withdrawal.approved_at = datetime.utcnow()
+                db.session.commit()
+    
+    column_actions_list = [('approve', 'Одобрить')]
+    
 # Инициализация админки
 def init_admin(app):
     from app.models import User, Task, UserTask, Transaction

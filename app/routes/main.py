@@ -26,3 +26,11 @@ def about():
 @main_bp.route('/how-it-works')
 def how_it_works():
     return render_template('how_it_works.html')
+
+    @main_bp.route('/faq')
+    def faq():
+        return render_template('faq.html')
+
+@main_bp.route('/rules')
+def rules():
+    return render_template('rules.html')
