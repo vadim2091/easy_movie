@@ -1,15 +1,13 @@
-from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from datetime import datetime
 import secrets
-
-db = SQLAlchemy()
+from app import db  # ← ЕДИНСТВЕННЫЙ ИСТОЧНИК db
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
     __table_args__ = {'extend_existing': True}
 
-    id = db.Column(db.Integer, primary_key=True)  # ← ЭТО ВАЖНО!
+    id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password_hash = db.Column(db.String(200))
@@ -30,11 +28,23 @@ class User(UserMixin, db.Model):
 
     referrals = db.relationship('User', backref=db.backref('referrer', remote_side=[id]))
 
+class Category(db.Model):
+    __tablename__ = 'categories'
+    __table_args__ = {'extend_existing': True}
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), nullable=False)
+    slug = db.Column(db.String(50), unique=True, nullable=False)
+    icon = db.Column(db.String(20), default='📦')
+    sort_order = db.Column(db.Integer, default=0)
+    min_age = db.Column(db.Integer, default=0)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
 class Task(db.Model):
     __tablename__ = 'tasks'
     __table_args__ = {'extend_existing': True}
 
-    id = db.Column(db.Integer, primary_key=True)  # ← БЕЗ ЭТОГО ВСЁ ПАДАЕТ!
+    id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text, nullable=False)
     reward = db.Column(db.Integer, nullable=False)
@@ -48,18 +58,6 @@ class Task(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     category = db.relationship('Category', backref='tasks')
-
-class Category(db.Model):
-    __tablename__ = 'categories'
-    __table_args__ = {'extend_existing': True}
-
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), nullable=False)
-    slug = db.Column(db.String(50), unique=True, nullable=False)
-    icon = db.Column(db.String(20), default='📦')
-    sort_order = db.Column(db.Integer, default=0)
-    min_age = db.Column(db.Integer, default=0)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 class UserTask(db.Model):
     __tablename__ = 'user_tasks'

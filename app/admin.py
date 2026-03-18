@@ -2,8 +2,9 @@ from flask import redirect, url_for
 from flask_admin import Admin, AdminIndexView, expose
 from flask_admin.contrib.sqla import ModelView
 from flask_login import current_user
-from app import db
-from app.models import User, Task, UserTask
+from app import db  # импортируем db из __init__
+from app.models import User, Task, Category, UserTask, Transaction, SupportMessage, TaskReview, Withdrawal
+from datetime import datetime
 
 # Защита админки: только админы
 class AdminModelView(ModelView):
