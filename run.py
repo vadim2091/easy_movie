@@ -10,7 +10,6 @@ def start_bot():
     start_bot()
 
 if __name__ == '__main__':
-    # Запуск бота в фоновом потоке
     bot_thread = threading.Thread(target=start_bot, daemon=True)
     bot_thread.start()
     print("🚀 Easy Movie запущен")

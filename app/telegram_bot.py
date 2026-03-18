@@ -2,16 +2,19 @@ import asyncio
 import threading
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, MessageHandler, filters, ContextTypes
-from app.websocket import socketio  # для отправки ответов в чат
 from datetime import datetime
 
-# Токен и ID админа – проверьте, что они верны
+# ========== НАСТРОЙКИ ==========
 BOT_TOKEN = "8648309291:AAGLeQT72rvRFVsdw_dZdeSjwmgFKYb_Sa8"
-ADMIN_CHAT_ID = 5753686567  # без кавычек
+ADMIN_CHAT_ID = 5753686567  # твой ID
 
-# Словарь для хранения состояния ответов: {admin_chat_id: target_user_id}
+# Хранилище для ответов админа: {admin_chat_id: target_user_id}
 admin_reply_target = {}
 
+# Ссылка на приложение бота (заполнится при запуске)
+_bot_app = None
+
+# ========== ОБРАБОТЧИКИ ==========
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "👋 Я бот поддержки Easy Movie.\n"
@@ -20,13 +23,17 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 async def handle_user_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Обработка сообщений, пришедших в личку боту (от админа или обычного пользователя)."""
+    """Обрабатывает сообщения, пришедшие в личку боту."""
     user_id = update.effective_user.id
-    # Если это сообщение от админа и он сейчас отвечает кому-то
+
+    # Если это ответ админа (он находится в режиме ответа)
     if user_id == ADMIN_CHAT_ID and user_id in admin_reply_target:
         target_user_id = admin_reply_target[user_id]
         text = update.message.text
-        # Отправляем сообщение пользователю через вебсокет (в чат поддержки)
+
+        # Отправляем ответ пользователю через вебсокет
+        # Импортируем здесь, чтобы избежать циклического импорта
+        from app.websocket import socketio
         socketio.emit('new_message', {
             'user_id': target_user_id,
             'username': 'Администратор',
@@ -34,16 +41,15 @@ async def handle_user_message(update: Update, context: ContextTypes.DEFAULT_TYPE
             'time': datetime.now().strftime('%H:%M'),
             'is_admin': True
         }, room=f'user_{target_user_id}')
-        # Уведомляем админа, что отправлено
+
         await update.message.reply_text(f"✅ Ответ отправлен пользователю {target_user_id}")
         del admin_reply_target[user_id]
+
     else:
-        # Это сообщение от обычного пользователя (или админа без контекста)
-        # Отправляем админу уведомление с кнопкой
-        keyboard = [
-            [InlineKeyboardButton("✅ Ответить", callback_data=f"reply_{user_id}")]
-        ]
+        # Это новое сообщение от пользователя (или админа не в режиме ответа)
+        keyboard = [[InlineKeyboardButton("✅ Ответить", callback_data=f"reply_{user_id}")]]
         reply_markup = InlineKeyboardMarkup(keyboard)
+
         await context.bot.send_message(
             chat_id=ADMIN_CHAT_ID,
             text=(
@@ -56,7 +62,6 @@ async def handle_user_message(update: Update, context: ContextTypes.DEFAULT_TYPE
             parse_mode="HTML",
             reply_markup=reply_markup
         )
-        # Подтверждение пользователю
         await update.message.reply_text("✅ Ваше сообщение отправлено администратору. Ожидайте ответа.")
 
 async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -66,14 +71,13 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     data = query.data
     if data.startswith('reply_'):
         user_id = int(data.split('_')[1])
-        # Сохраняем, что админ сейчас отвечает этому пользователю
         admin_reply_target[update.effective_user.id] = user_id
         await query.edit_message_text(text="✏️ Введите ответ для пользователя (одним сообщением):")
 
+# ========== ФУНКЦИИ ДЛЯ ВЫЗОВА ИЗ ВЕБСОКЕТА ==========
 def send_notification(username, user_id, message):
-    """Функция для вызова из вебсокета (синхронная) – отправляет уведомление админу через бота."""
+    """Отправляет уведомление админу о новом сообщении в чате."""
     try:
-        # Создаём event loop и запускаем асинхронную отправку
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         loop.run_until_complete(_async_notify(username, user_id, message))
@@ -82,10 +86,13 @@ def send_notification(username, user_id, message):
         print(f"❌ Ошибка в send_notification: {e}")
 
 async def _async_notify(username, user_id, message):
-    """Асинхронная отправка уведомления админу."""
-    application = Application.builder().token(BOT_TOKEN).build()
-    async with application:
-        await application.bot.send_message(
+    """Асинхронная отправка уведомления через уже работающее приложение бота."""
+    global _bot_app
+    if _bot_app is None:
+        print("❌ Бот ещё не запущен, уведомление не отправлено")
+        return
+    async with _bot_app:
+        await _bot_app.bot.send_message(
             chat_id=ADMIN_CHAT_ID,
             text=(
                 f"📨 <b>Новое сообщение в чате поддержки</b>\n"
@@ -97,16 +104,19 @@ async def _async_notify(username, user_id, message):
             parse_mode="HTML"
         )
 
+# ========== ЗАПУСК БОТА ==========
 def run_bot():
-    """Запуск бота в отдельном потоке (polling)."""
+    """Запускает бота (эта функция выполняется в отдельном потоке)."""
+    global _bot_app
     app = Application.builder().token(BOT_TOKEN).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CallbackQueryHandler(button_callback, pattern="^reply_"))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_user_message))
-    print("🤖 Telegram бот запущен")
+    _bot_app = app
+    print("🤖 Telegram бот запущен и ожидает сообщения...")
     app.run_polling()
 
 def start_bot():
-    """Запуск бота в фоновом потоке (для вызова из run.py)."""
+    """Запускает бота в фоновом потоке."""
     thread = threading.Thread(target=run_bot, daemon=True)
     thread.start()
